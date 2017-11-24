@@ -1,0 +1,179 @@
+<div data-page="result_filter" class="page navbar-fixed">
+    <!-- Top Navbar-->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="left">
+                <a href="result.html" class="back link icon-only" data-ignore-cache="true" data-force="true"><i class="icon icon-back"></i></a>
+            </div>
+            <div class="center sliding">設定</div>
+            <div class="right"></div>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="content-block-title">資料篩選</div>
+        <div class="list-block" style="margin-bottom:0">
+          <ul>
+            <li>
+              <div class="item-content">
+                <div class="item-inner" style="display:flex; margin-bottom:0px">
+                  <div class="item-title">日期區間</div>
+                  <div class="item-input" style="width:initial">
+                    <input type="text" id="query_calendar" placeholder="全部日期區間" readonly>
+                  </div>
+                </div>
+                <div class="item-media" style="margin-bottom:0px">
+                    <a id="query_calendar_clear" href="#" class="button" style="min-width:0"><i class="fa fa-eraser" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="list-block" style="margin-top:0">
+          <ul>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="query_endDate">
+                    <option value="0" {{#compare @global.query_endDate '==' false}}selected{{/compare}}>不限</option>
+                    <option value="1" {{#compare @global.query_endDate '==' true}}selected{{/compare}}>需在範圍內</option>
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">結束日期</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            {{#js_compare "Template7.global.User_level !== 'Guest'"}}
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="query_method">
+                    <option value="-1" {{#compare @global.query_method '==' -1}}selected{{/compare}}>無</option>
+                    <option value="1" {{#compare @global.query_method '==' 1}}selected{{/compare}}>一個標準差</option>
+                    <option value="2" {{#compare @global.query_method '==' 2}}selected{{/compare}}>兩個標準差</option>
+                    <option value="0" {{#compare @global.query_method '==' 0}}selected{{/compare}}>自訂</option>
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">分析方法</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="query_column">
+                    {{#each @global.table_column_alias}}
+                    <option value="{{@key}}" {{#compare @global.query_column '==' @key}}selected{{/compare}}>{{this}}</option>
+                    {{/each}}
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">分析欄位</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            {{/js_compare}}
+          </ul>
+        </div>
+        <div class="content-block-title">表格設定</div>
+        <div class="list-block">
+          <ul>
+            <li>
+                <a href="#" class="item-link smart-select">
+                    <!-- "multiple" attribute for multiple select-->
+                    <select name="table_column" multiple maxlength="5">
+                    {{#each @global.table_column_alias}}
+                        <option value="{{@key}}" {{#if @global.table_column.@key}}selected{{/if}}>{{this}}</option>
+                    {{/each}}
+                    </select>
+                    <div class="item-content">
+                      <div class="item-inner">
+                        <div class="item-title">顯示欄位</div>
+                      </div>
+                    </div>
+                </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="table_sort_column">
+                    {{#each @global.table_column_alias}}
+                    {{#if @global.table_column.@key}}
+                    <option value="{{@key}}" {{#compare @global.table_sort_column '==' @key}}selected{{/compare}}>{{this}}</option>
+                    {{/if}}
+                    {{/each}}
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">排序欄位</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="table_sort">
+                    <option value="ASC" {{#compare @global.table_sort '==' 'ASC'}}selected{{/compare}}>順序</option>
+                    <option value="DESC" {{#compare @global.table_sort '==' 'DESC'}}selected{{/compare}}>倒序</option>
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">排序方式</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+        {{#js_compare "Template7.global.User_level !== 'Guest'"}}
+        <div class="content-block-title">繪圖設定</div>
+        <div class="list-block">
+          <ul>
+            <li>
+                <a href="#" class="item-link smart-select">
+                    <!-- "multiple" attribute for multiple select-->
+                    <select name="chart_dot_type" multiple>
+                    {{#each @global.chart_dot_type}}
+                        <option value="{{@key}}" {{#if @global.chart_dot_type.@key}}selected{{/if}}>{{@key}}</option>
+                    {{/each}}
+                    </select>
+                    <div class="item-content">
+                      <div class="item-inner">
+                        <div class="item-title">顯示雞種</div>
+                      </div>
+                    </div>
+                </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="chart_dot_x">
+                    {{#each @global.table_column_alias}}
+                    <option value="{{@key}}" {{#compare @global.chart_dot_x '==' @key}}selected{{/compare}}>{{this}}</option>
+                    {{/each}}
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">X軸</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="chart_dot_y">
+                    {{#each @global.table_column_alias}}
+                    <option value="{{@key}}" {{#compare @global.chart_dot_y '==' @key}}selected{{/compare}}>{{this}}</option>
+                    {{/each}}
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Y軸</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+        {{/js_compare}}
+    </div>
+</div>

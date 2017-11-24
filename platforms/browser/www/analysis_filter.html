@@ -1,0 +1,62 @@
+<div data-page="analysis_filter" class="page navbar-fixed">
+    <!-- Top Navbar-->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="left">
+                <a href="analysis.html" class="back link icon-only" data-ignore-cache="true" data-force="true"><i class="icon icon-back"></i></a>
+            </div>
+            <div class="center sliding">分析設定</div>
+            <div class="right"></div>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="content-block-title">繪圖設定</div>
+        <div class="list-block">
+          <ul>
+            <li>
+                <a href="#" class="item-link smart-select">
+                    <!-- "multiple" attribute for multiple select-->
+                    <select name="chart_dot_type" multiple>
+                    {{#each @global.chart_dot_type}}
+                        <option value="{{@key}}" {{#if @global.chart_dot_type.@key}}selected{{/if}}>{{@key}}</option>
+                    {{/each}}
+                    </select>
+                    <div class="item-content">
+                      <div class="item-inner">
+                        <div class="item-title">顯示雞種</div>
+                      </div>
+                    </div>
+                </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="chart_dot_x">
+                    {{#each @global.table_column_alias}}
+                    <option value="{{@key}}" {{#compare @global.chart_dot_x '==' @key}}selected{{/compare}}>{{this}}</option>
+                    {{/each}}
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">X軸</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="item-link smart-select">
+                <select name="chart_dot_y">
+                    {{#each @global.table_column_alias}}
+                    <option value="{{@key}}" {{#compare @global.chart_dot_y '==' @key}}selected{{/compare}}>{{this}}</option>
+                    {{/each}}
+                </select>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-title">Y軸</div>
+                  </div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+    </div>
+</div>
