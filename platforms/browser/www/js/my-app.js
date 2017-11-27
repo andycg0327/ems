@@ -86,6 +86,11 @@ myApp.onPageInit('index', function (page) {
         });
     }
     
+    vue = new Vue({
+        el: '[data-page="index"].page .page-content',
+		data: { logged: localStorage.getItem('loginToken') != null }
+    });
+    
     if(localStorage.loginToken) {
         $.ajax({
             method: 'POST',
@@ -122,64 +127,65 @@ myApp.onPageInit('index', function (page) {
                 myApp.hideIndicator();
             }
         });
-    } else {
-        $('.form-to-data').on('click', function(){
-            $.ajax({
-                method: 'POST',
-                url: serverUrl + '/plant_ajax/',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                dataType: "json",
-                data: {loginToken: btoa($('[data-page="index"].page [name="Account"]').val() + ":" + $('[data-page="index"].page [name="Password"]').val())},
-                retryCount: 3,
-                beforeSend : function() {
-                    setTimeout(function() { myApp.showIndicator(); });
-                },
-                success : function(response) {
-                    if(response.loginToken == "False") {
-                        notification = myApp.addNotification({
-                            title: '錯誤',
-                            message: '登入失敗。請檢查帳號密碼是否正確。',
-                            hold: 3000,
-                            closeOnClick: true
-                        });
-                    } else if(response.loginToken == "Over") {
-                        notification = myApp.addNotification({
-                            title: '錯誤',
-                            message: '登入失敗。<br/>您的網路IP位置已於30分內嘗試超過10次。',
-                            hold: 3000,
-                            closeOnClick: true
-                        });
-                    } else {
-                        localStorage.loginToken = response.loginToken;
-                        globalData.account = response.account;
-                        globalData.plant_list = response.plant_list;
-                        localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
-                        vue_panel.resetData();
-                        ajaxData('main.html');
-                    }
-                },
-                error : function(xhr, textStatus, errorThrown ) {
+    }
+    
+    $('.form-to-data').on('click', function(){
+        $.ajax({
+            method: 'POST',
+            url: serverUrl + '/plant_ajax/',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            dataType: "json",
+            data: {loginToken: btoa($('[data-page="index"].page [name="Account"]').val() + ":" + $('[data-page="index"].page [name="Password"]').val())},
+            retryCount: 3,
+            beforeSend : function() {
+                setTimeout(function() { myApp.showIndicator(); });
+            },
+            success : function(response) {
+                if(response.loginToken == "False") {
                     notification = myApp.addNotification({
                         title: '錯誤',
-                        message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                        hold: 5000,
+                        message: '登入失敗。請檢查帳號密碼是否正確。',
+                        hold: 3000,
                         closeOnClick: true
                     });
-                    if (this.retryCount--)
-                        $.ajax(this);
-                },
-                complete : function() {
-                    myApp.hideIndicator();
+                } else if(response.loginToken == "Over") {
+                    notification = myApp.addNotification({
+                        title: '錯誤',
+                        message: '登入失敗。<br/>您的網路IP位置已於30分內嘗試超過10次。',
+                        hold: 3000,
+                        closeOnClick: true
+                    });
+                } else {
+                    localStorage.loginToken = response.loginToken;
+                    globalData.account = response.account;
+                    globalData.plant_list = response.plant_list;
+                    localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
+                    vue_panel.resetData();
+                    ajaxData('main.html');
                 }
-            });
+            },
+            error : function(xhr, textStatus, errorThrown ) {
+                notification = myApp.addNotification({
+                    title: '錯誤',
+                    message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
+                    hold: 5000,
+                    closeOnClick: true
+                });
+                if (this.retryCount--)
+                    $.ajax(this);
+            },
+            complete : function() {
+                myApp.hideIndicator();
+            }
         });
-    }
+    });
 }).trigger();
 
 myApp.onPageAfterAnimation('index', function (page) {
     setTimeout(function() {
         // $('#logo').height(window.outerHeight / 3);
         $("body").css({visibility: 'initial'});
+        // $('[data-page="index"].page .page-content').css({'padding-top': ($('[data-page="index"].page .page-content').height() - $('[data-page="index"].page .page-content .login-screen-title').height() - $('[data-page="index"].page .page-content form').height()) / 2});
         // $('#logo').height($('[data-page="index"].page').height() / 3);
         // setTimeout(function() { $('#logo').height($('[data-page="index"].page .page-content').height() / 3); });
     });

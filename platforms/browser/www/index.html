@@ -150,13 +150,13 @@
                             <span></span><span>© 2017 生禾禾科技實業股份有限公司</span><span></span>
                         </div>
                     </div>
-                    <div class="page-content login-screen-content">
+                    <div class="page-content login-screen-content" style="display: flex; flex-wrap: wrap; align-content:center;">
                         <div class="login-screen-title">
                             <div><img id="logo" src="./img/logo.png" style="height:200px" /></div>
                             <div>EMS環境控制系統</div>
                         </div>
-                        <form>
-                            <div class="list-block">
+                        <form style="width:100%">
+                            <div class="list-block" v-if="!logged">
                                 <ul>
                                     <li class="item-content">
                                         <div class="item-inner">
@@ -176,7 +176,7 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="content-block">
+                            <div class="content-block" v-if="!logged">
                                 <p><a href="#" class="button button-raised form-to-data">登入</a></p>
                             </div>
                         </form>
