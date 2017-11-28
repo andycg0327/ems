@@ -18,7 +18,8 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="14" />
-        <preference name="android-windowSoftInputMode" value="adjustResize" />
+        <preference name="android-windowSoftInputMode" value="stateVisible|adjustResize" />
+        <preference name="fullscreen" value="false" />
         <icon src="icon/android/mipmap-ldpi/ic_launcher.png" qualifier="ldpi" />
         <icon src="icon/android/mipmap-mdpi/ic_launcher.png" qualifier="mdpi" />
         <icon src="icon/android/mipmap-hdpi/ic_launcher.png" qualifier="hdpi" />

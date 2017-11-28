@@ -300,11 +300,24 @@ $(document).on('deviceready', function() {
     document.addEventListener("backbutton", function() {
         if ($('body').hasClass('with-panel-left-cover'))    // Panel
             myApp.closePanel();
-        else if (calendarPicker.opened) // 日曆
+        else if (calendarPicker && calendarPicker.opened) // 日曆
             calendarPicker.close();
         else if ($('.modal-in').length > 0)    // Modal
             myApp.closeModal();
-        else    // 上一頁
+        else if(mainView.activePage.name == 'main') { // 已在首頁
+            myApp.modal({
+                title: '訊息',
+                text: '確定結束應用程式嗎？', 
+                buttons: [{
+                    text: '取消'
+                },{
+                    text: '確定',
+                    onClick: function () {
+                        navigator.app.exitApp();;
+                    }
+                }]
+            });
+        } else    // 上一頁
             mainView.router.back();
     }, false);
 });
