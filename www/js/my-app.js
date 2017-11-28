@@ -25,6 +25,11 @@ var myApp = new Framework7({
     swipePanel: 'left',
     swipePanelActiveArea: 20,
     smartSelectOpenIn:'popup',
+    onPageAfterAnimation: function (xhr) {
+        $('input').click(function() {
+            $(this).focus()
+        });
+    },
 
     // Hide and show indicator during ajax requests
     onAjaxStart: function (xhr) {
