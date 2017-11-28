@@ -1,4 +1,6 @@
 myApp.onPageInit('report_form', function (page) {
+    var formChanged = false;
+    
 	localData = {
         readonly: !page.query.OID ? false : Cycle.Readonly
 	};
@@ -6,6 +8,23 @@ myApp.onPageInit('report_form', function (page) {
         el: page.container.children[0],
 		data: localData,
         methods: {
+            back: function() {
+                if(formChanged) {
+                    myApp.modal({
+                        title: '訊息',
+                        text: '資料尚未儲存，確定離開？', 
+                        buttons: [{
+                            text: '取消'
+                        },{
+                            text: '確定',
+                            onClick: function () {
+                                mainView.router.back();
+                            }
+                        }]
+                    });
+                } else
+                    mainView.router.back();
+            },
             submit: function() {
                 var data = $('[data-page="report_form"].page .page-content form').serializeArray();
                 data.push({name: 'PlantOID', value: localStorage.PlantOID});
@@ -47,6 +66,11 @@ myApp.onPageInit('report_form', function (page) {
                     }
                 });
             }
+        },
+        mounted: function () {
+            $(page.container).find('input, select, textarea').change(function() {
+                formChanged = true;
+            });
         }
     });
     

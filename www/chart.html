@@ -7,7 +7,7 @@
             </div>
             <div class="center sliding">曲線圖</div>
             <div class="right">
-                <a href="#" class="link icon-only" id="submit"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                <a href="#" class="link icon-only" onclick="ajaxSensor(vue)"><i class="fa fa-refresh" aria-hidden="true"></i></a>
             </div>
         </div>
     </div>
@@ -39,7 +39,7 @@
                 </select>
                 <i class="fa fa-search" aria-hidden="true"></i>
             </a>-->
-            <a href="#" class="link smart-select active" data-page-title="參數顯示設定" data-back-on-select="true">
+            <a href="#" class="link smart-select active" data-page-title="參數顯示設定" data-back-text="返回" data-back-on-select="true">
                 <select v-model="parameters" multiple>
                     <optgroup label="飼養參數">
                         <option v-for="s in chartLoadData" :value="s.label">{{s.label}}</option>

@@ -34,7 +34,7 @@
     background: #fafafa;
 }
 .facebook-card .card-footer a {
-    color: #81848b;
+    /* color: #81848b; */
     font-weight: 500;
 }
 .facebook-card .card-content img {
@@ -70,6 +70,12 @@
 
 .list-block input {
     text-align: right;
+}
+
+/* Android版 SmartSelect偏移補正 */
+.list-block.inputs-list .smart-select .item-inner {
+    display: flex;
+    padding-bottom: 8px;
 }
 
 .item-input.item-input-field.required:after, .item-inner.required:after {

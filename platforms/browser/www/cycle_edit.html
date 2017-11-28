@@ -3,7 +3,7 @@
     <div class="navbar">
         <div class="navbar-inner">
             <div class="left">
-                <a href="#" class="back link icon-only"><i class="icon icon-back"></i></a>
+                <a href="#" class="link icon-only" @click="back"><i class="icon icon-back"></i></a>
             </div>
             <div class="center sliding">飼養週期</div>
             <div class="right">
@@ -23,7 +23,7 @@
                                 <option v-for="s in source" :value="s.OID">{{s.Title}}</option>
                             </select>
                             <div class="item-content">
-                                <div class="item-title">種雞來源</div>
+                                <div class="item-media">種雞來源</div>
                                 <div class="item-inner">
                                     <div class="item-after smart-select-value">{{cycle ? _.find(source, {OID: cycle.SourceOID}).Title : source[0].Title}}</div>
                                 </div>
@@ -32,60 +32,60 @@
                     </li>
                     <li>
                         <div class="item-content">
-                                <div class="item-media">開始日期</div>
+                            <div class="item-media">開始日期</div>
                             <div class="item-inner">
                                 <div class="item-input">
-                                  <input type="text" name="StartDate" :value="cycle ? cycle.StartDate : null" :disabled="readonly" required>
+                                    <input type="text" name="StartDate" :value="cycle ? cycle.StartDate : null" :disabled="readonly" required>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li>
                         <div class="item-content">
-                                <div class="item-media">飼養天數</div>
+                            <div class="item-media">飼養天數</div>
                             <div class="item-inner">
                                 <div class="item-input">
-                                  <input type="tel" name="PeriodDays" :value="cycle ? cycle.PeriodDays : null" :disabled="readonly" required>
+                                    <input type="tel" name="PeriodDays" :value="cycle ? cycle.PeriodDays : null" :disabled="readonly" required>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li>
                         <div class="item-content">
-                                <div class="item-media">額定進雞數量</div>
+                            <div class="item-media">額定進雞數量</div>
                             <div class="item-inner">
                                 <div class="item-input">
-                                  <input type="tel" name="Amount" :value="cycle ? cycle.Amount : null" :disabled="readonly" required>
+                                    <input type="tel" name="Amount" :value="cycle ? cycle.Amount : null" :disabled="readonly" required>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li>
                         <div class="item-content">
-                                <div class="item-media">實際進雞數量</div>
+                            <div class="item-media">實際進雞數量</div>
                             <div class="item-inner">
                                 <div class="item-input">
-                                  <input type="tel" name="AmountReal" :value="cycle ? cycle.AmountReal : null" :disabled="readonly" required>
+                                    <input type="tel" name="AmountReal" :value="cycle ? cycle.AmountReal : null" :disabled="readonly" required>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li>
                         <div class="item-content">
-                                <div class="item-media">雛雞重量</div>
+                            <div class="item-media">雛雞重量</div>
                             <div class="item-inner">
                                 <div class="item-input">
-                                  <input type="tel" name="Weight" :value="cycle ? cycle.Weight : null" placeholder="公克(g)" :disabled="readonly" required>
+                                    <input type="tel" name="Weight" :value="cycle ? cycle.Weight : null" placeholder="公克(g)" :disabled="readonly" required>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li>
                         <div class="item-content">
-                                <div class="item-media">飲水飼料比例</div>
+                            <div class="item-media">飲水飼料比例</div>
                             <div class="item-inner">
                                 <div class="item-input">
-                                  <input type="tel" name="WaterFeedRatio" :value="cycle ? cycle.WaterFeedRatio : null" :disabled="readonly" required>
+                                    <input type="tel" name="WaterFeedRatio" :value="cycle ? cycle.WaterFeedRatio : null" :disabled="readonly" required>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                                 <option v-for="s in ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]" :value="s + ':00:00'" :selected="cycle ? (cycle.DailyConclude == s + ':00:00') : null">{{s}}:00:00</option>
                             </select>
                             <div class="item-content">
-                                    <div class="item-title">每日結算時間</div>
+                                <div class="item-media">每日結算時間</div>
                                 <div class="item-inner">
                                     <div class="item-after smart-select-value">{{cycle ? cycle.DailyConclude : '12:00:00'}}</div>
                                 </div>

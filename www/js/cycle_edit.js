@@ -1,4 +1,6 @@
 myApp.onPageInit('cycle_edit', function (page) {
+    var formChanged = false;
+    
     var Cycle = _.find(globalData.load_cycle, {OID: parseInt(page.query.OID)});
 	localData = {
 		cycle: page.query.OID ? Cycle : null,
@@ -9,6 +11,23 @@ myApp.onPageInit('cycle_edit', function (page) {
         el: page.container.children[0],
 		data: localData,
         methods: {
+            back: function() {
+                if(formChanged) {
+                    myApp.modal({
+                        title: '訊息',
+                        text: '資料尚未儲存，確定離開？', 
+                        buttons: [{
+                            text: '取消'
+                        },{
+                            text: '確定',
+                            onClick: function () {
+                                mainView.router.back();
+                            }
+                        }]
+                    });
+                } else
+                    mainView.router.back();
+            },
             submit: function() {
                 if(formValidate($(page.container).find('form'))) {
                     var data = $('[data-page="cycle_edit"].page .page-content form').serializeArray();
@@ -42,54 +61,6 @@ myApp.onPageInit('cycle_edit', function (page) {
                         }
                     });
                 }
-                // $(page.container).find('form').submit();
-                // _.forEachRight($('[data-page="cycle_edit"].page .page-content form [required]'), function(el) {
-                    // if(el.value == "") {
-                        // el.focus();
-                        // $(el).parent().addClass('required');
-                    // } else
-                        // $(el).parent().removeClass('required');
-                // })
-                // if(_.every($('[data-page="cycle_edit"].page .page-content form [required]'), function(el) { return el.value != ""; })) {
-                    // var data = $('[data-page="cycle_edit"].page .page-content form').serializeArray();
-                    // data.push({name: 'PlantOID', value: localStorage.PlantOID});
-                    // data.push({name: 'loginToken', value: localStorage.loginToken});
-                    // $.ajax({
-                        // method: 'POST',
-                        // url: serverUrl + '/plant_ajax/form_cycle/',
-                        // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                        // dataType: "html",
-                        // data: data,
-                        // retryCount: 3,
-                        // beforeSend : function() {
-                            // setTimeout(function() { myApp.showIndicator(); });
-                        // },
-                        // success : function(response) {
-                            // ajaxData('cycle.html', true);
-                        // },
-                        // error : function(xhr, textStatus, errorThrown ) {
-                            // myApp.addNotification({
-                                // title: '錯誤',
-                                // message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                // hold: 5000,
-                                // closeOnClick: true
-                            // });
-                            // if (this.retryCount--)
-                                // $.ajax(this);
-                        // },
-                        // complete : function() {
-                            // myApp.hideIndicator();
-                        // }
-                    // });
-                // } else {
-                    // myApp.addNotification({
-                        // title: '訊息',
-                        // message: '有必填欄位尚未完成填寫',
-                        // hold: 5000,
-                        // closeIcon: false,
-                        // closeOnClick: true
-                    // });
-                // }
             }
         }
     });
@@ -106,7 +77,12 @@ myApp.onPageInit('cycle_edit', function (page) {
                 firstDay: 0,
                 closeOnSelect: true,
                 value: page.query.OID ? [this.cycle.StartDate] : null,
-                minDate: !page.query.OID && globalData.load_cycle.length == 0 || page.query.OID && globalData.load_cycle.length == 1 ? null : moment(globalData.load_cycle[page.query.OID && globalData.load_cycle.length >= 2 ? 1 : 0].EndDate).add(1, 'days').toDate()
+                minDate: !page.query.OID && globalData.load_cycle.length == 0 || page.query.OID && globalData.load_cycle.length == 1 ? null : moment(globalData.load_cycle[page.query.OID && globalData.load_cycle.length >= 2 ? 1 : 0].EndDate).add(1, 'days').toDate(),
+                toolbarCloseText: '確定'
+            });
+            
+            $(page.container).find('input, select, textarea').change(function() {
+                formChanged = true;
             });
         }
     });

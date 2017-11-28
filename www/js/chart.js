@@ -20,6 +20,15 @@ myApp.onPageInit('chart', function (page) {
         periodMode: 'D',
         parameters: ["增重", "標準重", "毛雞重"]
 	};
+    new Vue({
+        el: page.container.children[0],
+		data: localData,
+        methods: {
+            refresh: function() {
+                ajaxSensor(vue);
+            }
+        }
+    });
     vue = new Vue({
         el: page.container.children[1],
 		data: localData,
@@ -42,13 +51,16 @@ myApp.onPageInit('chart', function (page) {
                     direction: 'vertical',
                     firstDay: 0,
                     rangePicker: true,
-                    value: [this.selectedCycle.StartDate, moment.min(moment(), moment(this.selectedCycle.EndDate)).format('YYYY-MM-DD')],
+                    // value: [this.selectedCycle.StartDate, moment.min(moment(), moment(this.selectedCycle.EndDate)).format('YYYY-MM-DD')],
+                    value: [this.selectedCycle.StartDate, moment(this.selectedCycle.EndDate).format('YYYY-MM-DD')],
                     minDate: moment(this.selectedCycle.StartDate).toDate(),
-                    maxDate: moment.min(moment(), moment(this.selectedCycle.EndDate)).toDate(),
+                    // maxDate: moment.min(moment(), moment(this.selectedCycle.EndDate)).toDate(),
+                    maxDate: moment(this.selectedCycle.EndDate).toDate(),
                     onChange: function(p, values, displayValues) {
                         self.selectedDate = values;
                     },
-                    toolbarTemplate: '<div class="toolbar"><div class="toolbar-inner">{{monthPicker}}<button class="button button-round active" style="overflow:visible" onclick="vue.calendarDateResetValue()"><i class="fa fa-arrows-h" aria-hidden="true"></i></button>{{yearPicker}}</div></div> '
+                    toolbarCloseText: '確定',
+                    toolbarTemplate: '<div class="toolbar"><div class="toolbar-inner">{{monthPicker}}<button class="button button-round active" style="overflow:visible" onclick="vue.calendarDateResetValue()"><i class="fa fa-arrows-alt" aria-hidden="true"></i></button>{{yearPicker}}</div></div> '
                 });
 			},
 			calendarDateOpen: function(e) {
@@ -58,30 +70,29 @@ myApp.onPageInit('chart', function (page) {
 			calendarDateResetValue: function(e) {
 				calendarPicker.setValue([this.selectedCycle.StartDate, this.selectedCycle.EndDate]);
 			},
-			prepareDraw: function(index = 0) {
+			prepareDraw: function() {
                 var param = _.filter(this.parameters, function(o) { return !isNaN(o); });
-                if(index < param.length) {
+                if(param.length > 0) {
                     var self = this;
-                    var channelOID = param[index];
                     $.ajax({
                         method: 'POST',
                         url: serverUrl + '/plant_ajax/ajaxSensorData/',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                         dataType: "json",
-                        data: {ChannelOID: channelOID, Start: this.selectedCycle.StartDate, End: this.selectedCycle.EndDate, loginToken: localStorage.loginToken},
+                        data: {ChannelOID: JSON.stringify(param), Start: this.selectedCycle.StartDate, End: this.selectedCycle.EndDate, loginToken: localStorage.loginToken},
                         retryCount: 3,
                         beforeSend : function() {
                             setTimeout(function() { myApp.showIndicator(); });
                         },
                         success : function(response) {
-                            if(globalData.sensorData[channelOID] == null)
-                                globalData.sensorData[channelOID] = [];
                             $.each(response, function(index, item) {
-                                var d = globalData.sensorData[channelOID];
+                                if(globalData.sensorData[item.ChannelOID] == null)
+                                    globalData.sensorData[item.ChannelOID] = [];
+                                var d = globalData.sensorData[item.ChannelOID];
                                 if(d.length == 0 || moment(item.UnixTime).isAfter(d[d.length - 1][0]))
                                     d.push([moment(item.UnixTime), item.Value]);
                             });
-                            self.prepareDraw(index + 1);
+                            self.drawChart();
                         },
                         error : function(xhr, textStatus, errorThrown ) {
                             notification = myApp.addNotification({
@@ -323,24 +334,28 @@ myApp.onPageInit('chart', function (page) {
             },
             // 調整顯示參數
             parameters: function () {
-                globalData.sensorData = globalData.sensorData || {};
-                this.prepareDraw();
+                var self = this;
+                $('.popup.smart-select-popup').off('popup:close').on('popup:close', function () {
+                    globalData.sensorData = globalData.sensorData || {};
+                    self.prepareDraw();
+                });
             }
         }
     });
-            mc = new Hammer(document.getElementById('chartCustomized'), { domEvents: true }), zoom = 1;
-            mc.get('pinch').set({ enable: true });
-            $( "#chartCustomized" ).on({
-                pinch: function(ev) {
-                    plotCustomized.zoom({
-                        amount: ev.originalEvent.gesture.scale / zoom,
-                        center: { left: ev.originalEvent.gesture.center.x, top: ev.originalEvent.gesture.center.y }
-                    });
-                    zoom = ev.originalEvent.gesture.scale;
-                }, 
-                pinchend: function(ev) {
-                    zoom = 1;
-                }
+    
+    mc = new Hammer(document.getElementById('chartCustomized'), { domEvents: true }), zoom = 1;
+    mc.get('pinch').set({ enable: true });
+    $( "#chartCustomized" ).on({
+        pinch: function(ev) {
+            plotCustomized.zoom({
+                amount: ev.originalEvent.gesture.scale / zoom,
+                center: { left: ev.originalEvent.gesture.center.x, top: ev.originalEvent.gesture.center.y }
             });
+            zoom = ev.originalEvent.gesture.scale;
+        }, 
+        pinchend: function(ev) {
+            zoom = 1;
+        }
+    });
 });
     

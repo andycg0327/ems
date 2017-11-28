@@ -25,32 +25,32 @@
                     <ul>
                         <li class="item-content">
                             <div class="item-inner">
-                                <div class="item-title">日期</div>
+                                <div class="item-title">最新日期</div>
                                 <div class="item-after">{{cycle_data.Date + ' (第' + cycle_data.DayNumber + '天)'}}</div>
                             </div>
                         </li>
-                        <li class="item-content">
+                        <li class="item-content" v-if="cycle_data.Weight">
                             <div class="item-inner">
-                                <div class="item-title">秤重隻數</div>
-                                <div class="item-after">{{cycle_data.WeightAmount}}</div>
+                                <div class="item-title">毛雞重(標準重)</div>
+                                <div class="item-after">{{cycle_data.Weight}} ({{cycle_data.WeightStd}}) g</div>
                             </div>
                         </li>
-                        <li class="item-content">
+                        <li class="item-content" v-if="cycle_data.FCR">
                             <div class="item-inner">
                                 <div class="item-title">換肉率</div>
                                 <div class="item-after">{{cycle_data.FCR}}</div>
                             </div>
                         </li>
-                        <li class="item-content">
+                        <li class="item-content" v-if="cycle_data.TemperatureHigh">
                             <div class="item-inner">
                                 <div class="item-title">最高室內溫度</div>
-                                <div class="item-after">{{cycle_data.TemperatureHigh}}</div>
+                                <div class="item-after">{{cycle_data.TemperatureHigh}}°C</div>
                             </div>
                         </li>
-                        <li class="item-content">
+                        <li class="item-content" v-if="cycle_data.TemperatureLow">
                             <div class="item-inner">
                                 <div class="item-title">最低室內溫度</div>
-                                <div class="item-after">{{cycle_data.TemperatureLow}}</div>
+                                <div class="item-after">{{cycle_data.TemperatureLow}}°C</div>
                             </div>
                         </li>
                     </ul>
@@ -58,7 +58,7 @@
             </div>
         </div> 
         <div class="card" v-if="cycle_data">
-            <div class="card-footer"><span></span><span>數據最後結算: {{lastUpdate.format("YYYY-MM-DD HH:mm")}} ({{lastUpdate.fromNow()}})</span></div>
+            <div class="card-footer"><span></span><span>數據結算: {{lastUpdate.format("YYYY-MM-DD HH:mm")}} ({{lastUpdate.fromNow()}})</span></div>
         </div> 
     </div>
 </div>

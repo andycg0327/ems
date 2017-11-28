@@ -5,6 +5,8 @@ var panelData = {
     plant_list: null,
     selectedPlant: null
 };
+moment.tz.setDefault("Asia/Taipei");
+moment.locale('zh-tw');
 
 // 判斷平台並修改樣式
 if (Framework7.prototype.device.android) {

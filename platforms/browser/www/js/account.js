@@ -1,4 +1,6 @@
 myApp.onPageInit('account', function (page) {
+    var formChanged = false;
+    
 	localData = {
         account: panelData.account,
         newPassword: null
@@ -7,6 +9,23 @@ myApp.onPageInit('account', function (page) {
         el: page.container.children[0],
 		data: localData,
         methods: {
+            back: function() {
+                if(formChanged) {
+                    myApp.modal({
+                        title: '訊息',
+                        text: '資料尚未儲存，確定離開？', 
+                        buttons: [{
+                            text: '取消'
+                        },{
+                            text: '確定',
+                            onClick: function () {
+                                mainView.router.back();
+                            }
+                        }]
+                    });
+                } else
+                    mainView.router.back();
+            },
             submit: function() {
                 if(formValidate($(page.container).find('form'))) {
                     var data = $('[data-page="account"].page .page-content form').serializeArray();
@@ -50,6 +69,11 @@ myApp.onPageInit('account', function (page) {
     });
     vue = new Vue({
         el: page.container.children[1],
-		data: localData
+		data: localData,
+        mounted: function () {
+            $(page.container).find('input, select, textarea').change(function() {
+                formChanged = true;
+            });
+        }
     });
 });
