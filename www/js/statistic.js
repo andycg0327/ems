@@ -95,9 +95,8 @@ myApp.onPageAfterAnimation('statistic', function (page) {
         padding: '0 5px'
     });
     
-    var swiper_header = myApp.swiper('[data-page="statistic"].page #swiper_header .swiper-container', {
+    var swiper_header = myApp.swiper('#swiper_header .swiper-container', {
         spaceBetween: 0,
-        slidesPerView: 3,
         breakpoints: {
             // when window width is <= 320px (iPhone5)
             320: {
@@ -121,10 +120,19 @@ myApp.onPageAfterAnimation('statistic', function (page) {
             }
         },
         on: {
-            sliderMove: function () {
-                swiper_contents.setTranslate(this.translate);
+            // sliderMove: function () {
+                // swiper_contents.setTranslate(this.translate);
+            // },
+            setTranslate: function () {
+                if(this.touches.diff != 0)
+                    swiper_contents.setTranslate(this.translate);
+            },
+            touchStart: function () {
+                swiper_contents.touches.diff = 0;
             },
             touchEnd: function () {
+                this.touches.diff = 0;
+                this.slideTo(this.activeIndex);
                 swiper_contents.slideTo(this.activeIndex);
             },
             transitionEnd: function () {
@@ -132,14 +140,12 @@ myApp.onPageAfterAnimation('statistic', function (page) {
             }
         }
     });
-    var swiper_contents = myApp.swiper('[data-page="statistic"].page #swiper_contents .swiper-container', {
+    var swiper_contents = myApp.swiper('#swiper_contents .swiper-container', {
         scrollbar: {
-            el: '[data-page="statistic"].page  #swiper_contents .swiper-scrollbar',
+            el: '#swiper_contents .swiper-scrollbar',
             hide: true,
         },
         spaceBetween: 0,
-        // resistance: false,
-        slidesPerView: 3,
         breakpoints: {
             // when window width is <= 320px (iPhone5)
             320: {
@@ -163,10 +169,19 @@ myApp.onPageAfterAnimation('statistic', function (page) {
             }
         },
         on: {
-            sliderMove: function () {
-                swiper_header.setTranslate(this.translate);
+            // sliderMove: function () {
+                // swiper_header.setTranslate(this.translate);
+            // },
+            setTranslate: function () {
+                if(this.touches.diff != 0)
+                    swiper_header.setTranslate(this.translate);
+            },
+            touchStart: function () {
+                swiper_header.touches.diff = 0;
             },
             touchEnd: function () {
+                this.touches.diff = 0;
+                this.slideTo(this.activeIndex);
                 swiper_header.slideTo(this.activeIndex);
             },
             transitionEnd: function () {

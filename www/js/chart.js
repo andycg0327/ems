@@ -48,7 +48,7 @@ myApp.onPageInit('chart', function (page) {
                     monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月' , '九月' , '十月', '十一月', '十二月'],
                     dayNamesShort: ['日', '一', '二', '三', '四', '五', '六'],
                     dateFormat: 'yyyy-mm-dd',
-                    direction: 'vertical',
+                    // direction: 'vertical',
                     firstDay: 0,
                     rangePicker: true,
                     // value: [this.selectedCycle.StartDate, moment.min(moment(), moment(this.selectedCycle.EndDate)).format('YYYY-MM-DD')],

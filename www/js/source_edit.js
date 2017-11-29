@@ -1,6 +1,4 @@
 myApp.onPageInit('source_edit', function (page) {
-    var formChanged = false;
-    
     var Source = _.find(globalData.load_source, {OID: parseInt(page.query.SourceOID || globalData.load_source[0].OID)});
 	localData = {
 		source: Source,
@@ -12,23 +10,6 @@ myApp.onPageInit('source_edit', function (page) {
         el: page.container.children[0],
 		data: localData,
         methods: {
-            back: function() {
-                if(formChanged) {
-                    myApp.modal({
-                        title: '訊息',
-                        text: '資料尚未儲存，確定離開？', 
-                        buttons: [{
-                            text: '取消'
-                        },{
-                            text: '確定',
-                            onClick: function () {
-                                mainView.router.back();
-                            }
-                        }]
-                    });
-                } else
-                    mainView.router.back();
-            },
             submit: function() {
                 if(formValidate($(page.container).find('form'))) {
                     var data = $('[data-page="source_edit"].page .page-content form').serializeArray();
@@ -109,11 +90,6 @@ myApp.onPageInit('source_edit', function (page) {
 		},
         beforeMount: function () {
             this.ajaxSourceData();
-        },
-        mounted: function () {
-            $(page.container).find('input, select, textarea').change(function() {
-                formChanged = true;
-            });
         }
     });
 });

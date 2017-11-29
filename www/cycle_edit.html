@@ -3,7 +3,7 @@
     <div class="navbar">
         <div class="navbar-inner">
             <div class="left">
-                <a href="#" class="link icon-only" @click="back"><i class="icon icon-back"></i></a>
+                <a href="#" class="back link icon-only"><i class="icon icon-back"></i></a>
             </div>
             <div class="center sliding">飼養週期</div>
             <div class="right">
@@ -12,13 +12,13 @@
         </div>
     </div>
     <div class="page-content">
-        <div class="content-block-title">{{cycle ? '修改' : '新增'}}飼養週期{{cycle ? ' (' + cycle.StartDate + ')' : ''}}</div>
+        <div class="content-block-title">{{readonly ? '檢視' : (cycle ? '修改' : '新增')}}飼養週期{{cycle ? ' (' + cycle.StartDate + ')' : ''}}</div>
         <div class="list-block">
             <form class="validate">
                 <input type="hidden" name="OID" :value="cycle ? cycle.OID : null" />
                 <ul>
                     <li>
-                        <a href="#" class="item-link smart-select" data-back-on-select="true">
+                        <a href="#" class="item-link smart-select" data-page-title="種雞來源" data-back-on-select="true">
                             <select name="SourceOID" :disabled="readonly">
                                 <option v-for="s in source" :value="s.OID">{{s.Title}}</option>
                             </select>
@@ -91,7 +91,7 @@
                         </div>
                     </li>
                     <li>
-                        <a href="#" class="item-link smart-select" data-back-on-select="true">
+                        <a href="#" class="item-link smart-select" data-page-title="每日結算時間" data-back-on-select="true">
                             <select name="DailyConclude" :disabled="readonly">
                                 <option v-for="s in ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]" :value="s + ':00:00'" :selected="cycle ? (cycle.DailyConclude == s + ':00:00') : null">{{s}}:00:00</option>
                             </select>

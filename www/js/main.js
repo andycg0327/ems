@@ -80,16 +80,6 @@ myApp.onPageInit('main', function (page) {
         },
         beforeMount: function () {
             this.resetData();
-        },
-        mounted: function () {
-        },
-        watch: {
-            cycle_data: _.debounce(
-                function () {
-                    // initChartMain();
-                },
-                100
-            )
         }
     });
 });

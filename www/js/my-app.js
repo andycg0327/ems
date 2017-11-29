@@ -1,5 +1,5 @@
 var serverUrl = "http://shhtest.shh.tw";
-var globalData = {}, localData, vue_panel, vue, calendarPicker, notification;
+var globalData = {}, localData, vue_panel, vue, calendarPicker, notificationㄝformChanged;
 var panelData = {
     account: null,
     plant_list: null,
@@ -22,45 +22,42 @@ var myApp = new Framework7({
     // init: false, //Disable App's automatic initialization
     material: Framework7.prototype.device.android,
     swipeBackPage: false,
-    swipePanel: 'left',
-    swipePanelActiveArea: 20,
+    // swipePanel: 'left',
+    // swipePanelActiveArea: 20,
     smartSelectOpenIn:'popup',
-    onPageAfterAnimation: function (xhr) {
-        $('input').click(function() {
-            $(this).focus()
+    smartSelectBackText: '返回',
+    onPageAfterAnimation: function (app, page) {
+        formChanged = false;
+        $(page.container).find('input, select, textarea').change(function() {
+            formChanged = true;
+        });
+        $(page.container).find('.back').removeClass('back').click(function() {
+            if(formChanged) {
+                myApp.modal({
+                    title: '訊息',
+                    text: '資料尚未儲存，確定離開？', 
+                    buttons: [{
+                        text: '取消'
+                    },{
+                        text: '確定',
+                        onClick: function () {
+                            mainView.router.back();
+                        }
+                    }]
+                });
+            } else
+                mainView.router.back();
+        });
+        $('input, textarea').click(function() {
+            $(this)[0].scrollIntoView();
         });
     },
-
-    // Hide and show indicator during ajax requests
     onAjaxStart: function (xhr) {
         myApp.showIndicator();
     },
     onAjaxComplete: function (xhr) {
         myApp.hideIndicator();
-    },
-    // onPageAfterAnimation: function(app, page) {
-        // $(page.container).find('form.validate').on('form:beforesend', function (e) {
-            // var valid = true;
-            // _.forEachRight(this.find('[required]'), function(el) {
-                // if(el.value == "") {
-                    // valid = false
-                    // el.focus();
-                    // $(el).parent().addClass('required');
-                // } else
-                    // $(el).parent().removeClass('required');
-            // })
-            // if(!valid) {
-                // myApp.addNotification({
-                    // title: '訊息',
-                    // message: '有必填欄位尚未完成填寫',
-                    // hold: 5000,
-                    // closeIcon: false,
-                    // closeOnClick: true
-                // });
-                // e.detail.xhr.abort();
-            // }
-        // });
-    // }
+    }
 });
 
 // Add view
