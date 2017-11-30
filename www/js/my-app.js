@@ -1,5 +1,6 @@
 var serverUrl = "http://shhtest.shh.tw";
-var globalData = {}, localData, vue_panel, vue, calendarPicker, notificationㄝformChanged;
+var globalData = {}, localData, vue_panel, vue, calendarPicker, notification, formChanged;
+            var h = $(window).height();
 var panelData = {
     account: null,
     plant_list: null,
@@ -35,7 +36,7 @@ var myApp = new Framework7({
             if(formChanged) {
                 myApp.modal({
                     title: '訊息',
-                    text: '資料尚未儲存，確定離開？', 
+                    text: '資料尚未儲存，確定離開？',
                     buttons: [{
                         text: '取消'
                     },{
@@ -47,9 +48,6 @@ var myApp = new Framework7({
                 });
             } else
                 mainView.router.back();
-        });
-        $('input, textarea').click(function() {
-            $(this)[0].scrollIntoView();
         });
     },
     onAjaxStart: function (xhr) {
@@ -89,12 +87,12 @@ myApp.onPageInit('index', function (page) {
             }
         });
     }
-    
+
     vue = new Vue({
         el: '[data-page="index"].page .page-content',
 		data: { logged: localStorage.getItem('loginToken') != null }
     });
-    
+
     $('.form-to-data').on('click', function(){
         $.ajax({
             method: 'POST',
@@ -154,7 +152,7 @@ myApp.onPageAfterAnimation('index', function (page) {
         // $('[data-page="index"].page .page-content').css({'padding-top': ($('[data-page="index"].page .page-content').height() - $('[data-page="index"].page .page-content .login-screen-title').height() - $('[data-page="index"].page .page-content form').height()) / 2});
         // $('#logo').height($('[data-page="index"].page').height() / 3);
         // setTimeout(function() { $('#logo').height($('[data-page="index"].page .page-content').height() / 3); });
-    
+
         setTimeout(function() {
             if(localStorage.loginToken) {
                 $.ajax({
@@ -309,7 +307,7 @@ $(document).on('deviceready', function() {
         else if(mainView.activePage.name == 'main') { // 已在首頁
             myApp.modal({
                 title: '訊息',
-                text: '確定結束應用程式嗎？', 
+                text: '確定結束應用程式嗎？',
                 buttons: [{
                     text: '取消'
                 },{
@@ -322,4 +320,10 @@ $(document).on('deviceready', function() {
         } else    // 上一頁
             mainView.router.back();
     }, false);
+});
+
+// Android 虛擬鍵盤偏移
+$(window).resize(function() {
+    if($(":focus").length > 0 && $(":focus").offset().top > h - $(window).height())
+        $(mainView.activePage.container).find('.page-content').scrollTop($(mainView.activePage.container).find('.page-content').scrollTop() + h - $(window).height());
 });
