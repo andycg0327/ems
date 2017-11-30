@@ -63,7 +63,8 @@ myApp.onPageInit('main', function (page) {
                 ], {
                     series: { shadowSize: 0 }, 
                     xaxis: { mode: "time", timezone: "browser", ticks: 3 },
-                    yaxes: [ {}, { axisLabel: '增重', position: "right" } ], 
+                    // yaxes: [ {}, { axisLabel: '增重', position: "right" } ], 
+                    yaxes: [ {}, { position: "right" } ], 
                     grid: { borderWidth: 0, hoverable: true, clickable: true },
                     legend: { position: "nw" },
                     tooltip: {
