@@ -29,7 +29,13 @@ ajaxSensor= function(vueInstance) {
         data: {PlantOID: localStorage.PlantOID, loginToken: localStorage.loginToken},
         retryCount: 3,
         beforeSend : function() {
-            setTimeout(function() { myApp.showIndicator(); });
+            setTimeout(function() { myApp.showIndicator(); 
+            notification = myApp.addNotification({
+                title: '錯誤',
+                message: '123..(',
+                hold: 5000,
+                closeOnClick: true
+            });});
         },
         success : function(response) {
             $.each(response, function(key, value){
