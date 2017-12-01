@@ -14,9 +14,9 @@ myApp.onPageInit('chart', function (page) {
             {label: "飲水量", key: 'Water', unit: "l", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 94, interpolate: true, float: 0, Chart: false}, 
             {label: "換肉率", key: 'FCR', unit: "", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 95, interpolate: true, float: 2, Chart: false}],
         sensor: null,
-        selectedCycleOID: globalData.load_cycle[0].OID,
-        selectedCycle: globalData.load_cycle[0],
-        selectedDate: [globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate],
+        selectedCycleOID: globalData.load_cycle.length > 0 ? globalData.load_cycle[0].OID : null,
+        selectedCycle: globalData.load_cycle.length > 0 ? globalData.load_cycle[0] : {StartDate: null, EndDate: null, DailyConclude: '00:00:00'},
+        selectedDate: globalData.load_cycle.length > 0 ? [globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate] : [],
         periodMode: 'D',
         parameters: ["增重", "標準重", "毛雞重"]
 	};
@@ -39,7 +39,8 @@ myApp.onPageInit('chart', function (page) {
 				localData.cycle_data = globalData.load_cycle_data;
 				localData.cycle_data_hourly = globalData.load_cycle_data_hourly;
 				localData.sensor = globalData.sensor;
-                setTimeout(function() { self.prepareDraw(); });
+                if(globalData.load_cycle_data.length > 0)
+                    setTimeout(function() { self.prepareDraw(); });
 			},
 			calendarDateInit: function(e) {
                 var self = this;
@@ -52,10 +53,10 @@ myApp.onPageInit('chart', function (page) {
                     firstDay: 0,
                     rangePicker: true,
                     // value: [this.selectedCycle.StartDate, moment.min(moment(), moment(this.selectedCycle.EndDate)).format('YYYY-MM-DD')],
-                    value: [this.selectedCycle.StartDate, moment(this.selectedCycle.EndDate).format('YYYY-MM-DD')],
-                    minDate: moment(this.selectedCycle.StartDate).toDate(),
+                    value: globalData.load_cycle.length > 0 ? [this.selectedCycle.StartDate, moment(this.selectedCycle.EndDate).format('YYYY-MM-DD')] : [],
+                    // minDate: moment(this.selectedCycle.StartDate).toDate(),
                     // maxDate: moment.min(moment(), moment(this.selectedCycle.EndDate)).toDate(),
-                    maxDate: moment(this.selectedCycle.EndDate).toDate(),
+                    // maxDate: moment(this.selectedCycle.EndDate).toDate(),
                     onChange: function(p, values, displayValues) {
                         self.selectedDate = values;
                     },
@@ -68,7 +69,8 @@ myApp.onPageInit('chart', function (page) {
 				calendarPicker.open();
 			},
 			calendarDateResetValue: function(e) {
-				calendarPicker.setValue([this.selectedCycle.StartDate, this.selectedCycle.EndDate]);
+                if(globalData.load_cycle.length > 0)
+                    calendarPicker.setValue([this.selectedCycle.StartDate, this.selectedCycle.EndDate]);
 			},
 			prepareDraw: function() {
                 var param = _.filter(this.parameters, function(o) { return !isNaN(o); });
@@ -116,7 +118,7 @@ myApp.onPageInit('chart', function (page) {
                 var data = [], yaxes = [], stdLineObj = [];
                 // var rangeMin = moment((groupIndex != null ? this.selectedCycle.StartDate : (this.selectedDate || this.selectedCycle.StartDate)) + " " + this.selectedCycle.DailyConclude);
                 // var rangeMax = groupIndex != null || this.selectedDate == null ? moment(this.selectedCycle.EndDate + " " + this.selectedCycle.DailyConclude) : moment(rangeMin).add(1, 'days');
-                var rangeMin = moment(moment(this.selectedDate[0]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude);
+                var rangeMin = globalData.load_cycle.length > 0 ? moment(moment(this.selectedDate[0]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment();
                 var rangeMax = moment.min(this.selectedDate.length == 2 ? moment(moment(this.selectedDate[1]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment(rangeMin).add(1, 'days'), moment().add(23, 'hours'));
                 
                 // ----- 飼養參數類 -----

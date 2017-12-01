@@ -14,19 +14,21 @@ myApp.onPageInit('main', function (page) {
         methods: {
             resetData: function() {
                 var self = this;
-                localData.cycle = globalData.load_cycle ? globalData.load_cycle[0] : null;
-                localData.cycle_data = globalData.load_cycle_data ? globalData.load_cycle_data[globalData.load_cycle_data.length - 1] : null;
-                localData.lastUpdate = globalData.load_cycle_data ? moment(globalData.load_cycle_data[globalData.load_cycle_data.length - 1].LastUpdate) : null;
-                setTimeout(function () { self.initChartMain(); });
+                localData.cycle = _.find(globalData.load_cycle, function(o) { return moment(o.StartDate) <= moment(); });
+                localData.cycle_data = globalData.load_cycle_data.length > 0 ? globalData.load_cycle_data[globalData.load_cycle_data.length - 1] : null;
+                localData.lastUpdate = globalData.load_cycle_data.length > 0 ? moment(globalData.load_cycle_data[globalData.load_cycle_data.length - 1].LastUpdate) : null;
+                if(globalData.load_cycle_data.length > 0)
+                    setTimeout(function () { self.initChartMain(); });
             },
             initChartMain: function () {
+                var self = this;
                 var dataWeightGain = [], dataWeightStd = [], dataWeight = [], dayLimit = 7;
                 $.each(globalData.load_cycle_data, function(index, item) {
-                    if(moment(item.Date).isBetween(globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate, null, '[]')) {
+                    if(moment(item.Date).isBetween(self.cycle.StartDate, self.cycle.EndDate, null, '[]')) {
                         dataWeight.push([moment(item.Date).add(1, 'day'), parseFloat(item.Weight || 0)]);
                         dataWeightStd.push([moment(item.Date).add(1, 'day'), parseFloat(item.WeightStd)]);
                     }
-                    if(moment(item.Date).isBetween(globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate, null, '(]')) {
+                    if(moment(item.Date).isBetween(self.cycle.StartDate, self.cycle.EndDate, null, '(]')) {
                         dataWeightGain.push([moment(item.Date).add(1, 'day'), parseFloat(item.WeightGain || 0)]);
                     }
                 });
@@ -70,7 +72,7 @@ myApp.onPageInit('main', function (page) {
                     tooltip: {
                         show: true,
                         contents: function(item) {
-                            var timestamp = moment(moment(parseFloat(item.datapoint[0])).format('YYYY-MM-DD' + " " + globalData.load_cycle[0].DailyConclude));
+                            var timestamp = moment(moment(parseFloat(item.datapoint[0])).format('YYYY-MM-DD' + " " + self.cycle.DailyConclude));
                             return moment(timestamp).subtract(1, 'day').format("YYYY-MM-DD HH:mm") + ' ~ ' + moment.min(timestamp, moment(moment().format("YYYY-MM-DD HH:00"))).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm") + "<br />" + item.series.label + ": " + item.datapoint[1].toFixed(item.series.float) + item.series.unit;
                         }
                     }

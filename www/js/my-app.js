@@ -29,7 +29,7 @@ var myApp = new Framework7({
     smartSelectBackText: '返回',
     onPageAfterAnimation: function (app, page) {
         formChanged = false;
-        $(page.container).find('input, select, textarea').change(function() {
+        $(page.container).find('form input, form select, form textarea').change(function() {
             formChanged = true;
         });
         $(page.container).find('.back').removeClass('back').click(function() {
@@ -49,6 +49,8 @@ var myApp = new Framework7({
             } else
                 mainView.router.back();
         });
+        
+        myApp.hideIndicator();
     },
     onAjaxStart: function (xhr) {
         myApp.showIndicator();

@@ -5,7 +5,7 @@ myApp.onPageInit('statistic', function (page) {
 	localData = {
 		cycle: globalData.load_cycle,
 		cycle_data: globalData.load_cycle_data,
-        selectedCycleOID: globalData.load_cycle[0].OID
+        selectedCycleOID: globalData.load_cycle.length > 0 ? globalData.load_cycle[0].OID : null
 	};
     new Vue({
         el: page.container.children[0],
@@ -16,11 +16,45 @@ myApp.onPageInit('statistic', function (page) {
 		data: localData,
 		methods: {
 			resetData: function() {
+                var self = this;
                 var newCycle = _.find(this.cycle, {OID: this.selectedCycleOID});
 				localData.cycle_data = _.filter(globalData.load_cycle_data, function(item) {
                     return moment(item.Date).isBetween(newCycle.StartDate, newCycle.EndDate, null, '[]') && moment(item.Date + ' ' + newCycle.DailyConclude).isBefore(moment());
                 });
-			}
+                setTimeout(function() { self.cssReset(); });
+			},
+            cssReset: function() {
+                // 凍結標題列
+                $('#swiper_header').css({
+                    position: 'fixed',
+                    top: $('.navbar').height(),
+                    'z-index': 999,
+                    width: '100%'
+                });
+                // 設定內容區塊，頂端標題列padding防止被navbar蓋住
+                $('#swiper_contents').css({
+                    'padding-top': $('.navbar').height()
+                });
+                // 日期欄寬度自動調整
+                $('[data-page="statistic"].page #swiper_contents .col-25').css({
+                    width: 'auto'
+                });
+                // 標題列的日期欄寬度設定一致
+                $('[data-page="statistic"].page #swiper_header .col-25').css({
+                    width: $('[data-page="statistic"].page #swiper_contents .col-25').width()
+                });
+                // 剩餘內容寬度自動計算
+                $('[data-page="statistic"].page .col-75').css({
+                    width: 'calc(100% - ' + $('[data-page="statistic"].page #swiper_contents .col-25').width() + 'px)'
+                });
+                // 儲存格左右padding調整縮小
+                $('[data-page="statistic"].page .numeric-cell').css({
+                    padding: '0 5px'
+                });
+            }
+        },
+        beforeMount: function () {
+            this.resetData();
         },
         watch: {
             selectedCycleOID: function (newCycleOID) {
@@ -67,34 +101,6 @@ myApp.onPageInit('statistic', function (page) {
 
 // var swiper_header, swiper_contents;
 myApp.onPageAfterAnimation('statistic', function (page) {
-    // 凍結標題列
-    $('#swiper_header').css({
-        position: 'fixed',
-        top: $('.navbar').height(),
-        'z-index': 999,
-        width: '100%'
-    });
-    // 設定內容區塊，頂端標題列padding防止被navbar蓋住
-    $('#swiper_contents').css({
-        'padding-top': $('.navbar').height()
-    });
-    // 日期欄寬度自動調整
-    $('[data-page="statistic"].page #swiper_contents .col-25').css({
-        width: 'auto'
-    });
-    // 標題列的日期欄寬度設定一致
-    $('[data-page="statistic"].page #swiper_header .col-25').css({
-        width: $('[data-page="statistic"].page #swiper_contents .col-25').width()
-    });
-    // 剩餘內容寬度自動計算
-    $('[data-page="statistic"].page .col-75').css({
-        width: 'calc(100% - ' + $('[data-page="statistic"].page #swiper_contents .col-25').width() + 'px)'
-    });
-    // 儲存格左右padding調整縮小
-    $('[data-page="statistic"].page .numeric-cell').css({
-        padding: '0 5px'
-    });
-    
     var swiper_header = myApp.swiper('#swiper_header .swiper-container', {
         spaceBetween: 0,
         breakpoints: {
@@ -190,6 +196,7 @@ myApp.onPageAfterAnimation('statistic', function (page) {
         }
     });
     
+    vue.cssReset();
     // 顯示內容
     $('[data-page="statistic"].page .page-content').css({visibility: 'visible'});
 });

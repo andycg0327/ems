@@ -7,7 +7,7 @@
             </div>
             <div class="center sliding">飼養週期</div>
             <div class="right">
-                <a href="cycle_edit.html" class="link icon-only" :class="{disabled: readonly}"><i class="fa fa-plus" aria-hidden="true" v-if="!readonly"></i></a>
+                <a href="cycle_edit.html" class="link icon-only" :class="{disabled: readonly || !allowAdd}"><i class="fa fa-plus" aria-hidden="true" v-if="!readonly && allowAdd"></i></a>
             </div>
         </div>
     </div>

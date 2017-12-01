@@ -201,7 +201,7 @@ And each series support the following options:
                 placeholder.find(".legend table").css('background-color', opts.legend.backgroundColor);
                 placeholder.find(".legendColorBox").css('width', 14);
                 // 顯示X軸標題
-                if(opts.legend.showTitle === true) {
+                if(opts.legend.showTitle === true && $.find('#legendTitle_' + placeholder[0].id).length == 0) {
                     placeholder.find("tbody").prepend('<tr><td colspan="2" style="padding-bottom:5px"><span id="legendTitle_' + placeholder[0].id + '" class="label label-primary"></span></td></tr>');
                 }
             }
