@@ -33,21 +33,7 @@ var myApp = new Framework7({
             formChanged = true;
         });
         $(page.container).find('.back').removeClass('back').click(function() {
-            if(formChanged) {
-                myApp.modal({
-                    title: '訊息',
-                    text: '資料尚未儲存，確定離開？',
-                    buttons: [{
-                        text: '取消'
-                    },{
-                        text: '確定',
-                        onClick: function () {
-                            mainView.router.back();
-                        }
-                    }]
-                });
-            } else
-                mainView.router.back();
+            backFormCheck();
         });
         
         myApp.hideIndicator();
@@ -297,6 +283,24 @@ function formValidate(formElement) {
     return valid;
 }
 
+function backFormCheck() {
+    if(formChanged) {
+        myApp.modal({
+            title: '訊息',
+            text: '資料尚未儲存，確定離開？',
+            buttons: [{
+                text: '取消'
+            },{
+                text: '確定',
+                onClick: function () {
+                    mainView.router.back();
+                }
+            }]
+        });
+    } else
+        mainView.router.back();
+}
+
 // Handle Cordova Device Ready Event
 $(document).on('deviceready', function() {
     document.addEventListener("backbutton", function() {
@@ -320,7 +324,7 @@ $(document).on('deviceready', function() {
                 }]
             });
         } else    // 上一頁
-            mainView.router.back();
+            backFormCheck();
     }, false);
 });
 
