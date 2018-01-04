@@ -313,7 +313,13 @@ $(document).on('deviceready', function() {
         },
         "windows": {}
     }).on('registration', function(data) {
-        console.log('registration event: ' + data.registrationId);
+        notification = myApp.addNotification({
+            title: '訊息',
+            message: 'registration event: ' + data.registrationId,
+            hold: 5000,
+            closeIcon: false,
+            closeOnClick: true
+        });
 
         var oldRegId = localStorage.getItem('registrationId');
         if (oldRegId !== data.registrationId) {
