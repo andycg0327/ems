@@ -313,7 +313,9 @@ $(document).on('deviceready', function() {
         },
         "windows": {}
     }).on('registration', function(data) {
+        alert('aaa');
         alert('registration event: ' + data.registrationId);
+        alert('aaa');
         notification = myApp.addNotification({
             title: '訊息',
             message: 'registration event: ' + data.registrationId,
