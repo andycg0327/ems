@@ -313,6 +313,7 @@ $(document).on('deviceready', function() {
         },
         "windows": {}
     }).on('registration', function(data) {
+        alert('registration event: ' + data.registrationId);
         notification = myApp.addNotification({
             title: '訊息',
             message: 'registration event: ' + data.registrationId,
@@ -320,6 +321,7 @@ $(document).on('deviceready', function() {
             closeIcon: false,
             closeOnClick: true
         });
+        alert('registration event: ' + data.registrationId);
 
         var oldRegId = localStorage.getItem('registrationId');
         if (oldRegId !== data.registrationId) {
