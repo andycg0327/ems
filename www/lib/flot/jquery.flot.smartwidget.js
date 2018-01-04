@@ -75,7 +75,7 @@ And each series support the following options:
         var placeholder = plot.getPlaceholder(), opts = plot.getOptions();
     
         // hover功能
-        placeholder.off("plotclick").on("plotclick", function (event, pos, item) {
+        placeholder.off("plotclick plothover").on("plotclick plothover", function (event, pos, item) {
             if(item) {
                 // crosshair吸附
                 if(opts.crosshair.lock === true) {

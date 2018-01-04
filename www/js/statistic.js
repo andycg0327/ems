@@ -2,23 +2,18 @@ myApp.onPageInit('statistic', function (page) {
     // 先隱藏內容，防止畫面調整時閃動
     $('[data-page="statistic"].page .page-content').css({visibility: 'hidden'});
     
-	localData = {
-		cycle: globalData.load_cycle,
-		cycle_data: globalData.load_cycle_data,
-        selectedCycleOID: globalData.load_cycle.length > 0 ? globalData.load_cycle[0].OID : null
-	};
-    new Vue({
-        el: page.container.children[0],
-		data: localData
-    });
     vue = new Vue({
         el: page.container.children[1],
-		data: localData,
+		data: {
+            cycle: globalData.load_cycle,
+            cycle_data: null,
+            selectedCycleOID: globalData.load_cycle.length > 0 ? globalData.load_cycle[0].OID : null
+        },
 		methods: {
 			resetData: function() {
                 var self = this;
                 var newCycle = _.find(this.cycle, {OID: this.selectedCycleOID});
-				localData.cycle_data = _.filter(globalData.load_cycle_data, function(item) {
+				this.cycle_data = _.filter(globalData.load_cycle_data, function(item) {
                     return moment(item.Date).isBetween(newCycle.StartDate, newCycle.EndDate, null, '[]') && moment(item.Date + ' ' + newCycle.DailyConclude).isBefore(moment());
                 });
                 setTimeout(function() { self.cssReset(); });
@@ -96,6 +91,10 @@ myApp.onPageInit('statistic', function (page) {
                     this.resetData();
             }
         }
+    });
+    new Vue({
+        el: page.container.children[0],
+		data: vue._data
     });
 });
 

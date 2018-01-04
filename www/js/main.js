@@ -1,22 +1,21 @@
 myApp.onPageInit('main', function (page) {
-    localData = {
-        cycle: null,
-        cycle_data: null,
-        lastUpdate: null
-    };
     new Vue({
         el: page.container.children[0],
 		data: panelData
     });
     vue = new Vue({
         el: page.container.children[1],
-        data: localData,
+        data: {
+            cycle: null,
+            cycle_data: null,
+            lastUpdate: null
+        },
         methods: {
             resetData: function() {
                 var self = this;
-                localData.cycle = _.find(globalData.load_cycle, function(o) { return moment(o.StartDate) <= moment(); });
-                localData.cycle_data = globalData.load_cycle_data.length > 0 ? globalData.load_cycle_data[globalData.load_cycle_data.length - 1] : null;
-                localData.lastUpdate = globalData.load_cycle_data.length > 0 ? moment(globalData.load_cycle_data[globalData.load_cycle_data.length - 1].LastUpdate) : null;
+                this.cycle = _.find(globalData.load_cycle, function(o) { return moment(o.StartDate) <= moment(); });
+                this.cycle_data = globalData.load_cycle_data.length > 0 ? globalData.load_cycle_data[globalData.load_cycle_data.length - 1] : null;
+                this.lastUpdate = globalData.load_cycle_data.length > 0 ? moment(globalData.load_cycle_data[globalData.load_cycle_data.length - 1].LastUpdate) : null;
                 if(globalData.load_cycle_data.length > 0)
                     setTimeout(function () { self.initChartMain(); });
             },
@@ -36,7 +35,7 @@ myApp.onPageInit('main', function (page) {
                         label: "增重", 
                         unit: "g", 
                         float: 2, 
-                        data: dataWeightGain.slice(dataWeightGain.length - dayLimit), 
+                        data: dataWeightGain.slice(Math.max(0, dataWeightGain.length - dayLimit)), 
                         bars: { 
                             show: true, 
                             barWidth: 24 * 60 * 60 * 1000, 
@@ -49,7 +48,7 @@ myApp.onPageInit('main', function (page) {
                         label: "標準重", 
                         unit: "g", 
                         float: 0, 
-                        data: dataWeightStd.slice(dataWeightStd.length - dayLimit - 1), 
+                        data: dataWeightStd.slice(Math.max(0, dataWeightStd.length - dayLimit - 1)), 
                         lines: { show: true, lineWidth: 7 }, 
                         points: { show: true, radius: 5 }, 
                         color: 89
@@ -57,7 +56,7 @@ myApp.onPageInit('main', function (page) {
                         label: "毛雞重", 
                         unit: "g", 
                         float: 2, 
-                        data: dataWeight.slice(dataWeight.length - dayLimit - 1), 
+                        data: dataWeight.slice(Math.max(0, dataWeight.length - dayLimit - 1)), 
                         lines: { show: true, lineWidth: 3 }, 
                         points: { show: true, radius: 5 }, 
                         color: 92

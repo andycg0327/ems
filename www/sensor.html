@@ -12,11 +12,91 @@
         </div>
     </div>
     <div class="page-content">
+        <!-- 秤重 -->
+        <div class="card" v-if="load_device">
+            <div class="card-header">
+                <div class="chip">
+                    <div class="chip-label">秤重</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="list-block media-list">
+                    <ul>
+                        <li v-for="item in load_device">
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">{{item.Interface}}</div>
+                                        <div class="item-after">{{item.Value}} g</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- 飼料錶 -->
+        <div class="card" v-for="item in sensor_fodder">
+            <div class="card-header">
+                <div class="chip">
+                    <div class="chip-label">{{item.Parameter}}</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="list-block media-list">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">{{item.InterfaceTitle}}</div>
+                                        <div class="item-after">{{Math.max(item.Min, Math.min(item.Value, item.Max)) + " " + item.Unit}}</div>
+                                    </div>
+                                    <div class="item-subtitle progressbar">
+                                        <span :style="'transform: translate3d(' + ((item.Value - item.Min) * 100 / (item.Max - item.Min) - 100) + '%, 0px, 0px);'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- 水錶 -->
+        <div class="card" v-for="item in sensor_water">
+            <div class="card-header">
+                <div class="chip">
+                    <div class="chip-label">{{item.Parameter}}</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="list-block media-list">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">{{item.InterfaceTitle}}</div>
+                                        <div class="item-after">{{Math.max(item.Min, Math.min(item.Value, item.Max)) + " " + item.Unit}}</div>
+                                    </div>
+                                    <div class="item-subtitle progressbar">
+                                        <span :style="'transform: translate3d(' + ((item.Value - item.Min) * 100 / (item.Max - item.Min) - 100) + '%, 0px, 0px);'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Sensor -->
         <div class="card" v-for="(group, type) in _.groupBy(sensor, 'Parameter')">
             <div class="card-header">
                 <div class="chip">
                     <div class="chip-label">{{type}}</div>
-                </div></div>
+                </div>
+            </div>
             <div class="card-content">
                 <div class="list-block media-list">
                     <ul>

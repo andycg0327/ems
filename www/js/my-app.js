@@ -1,6 +1,6 @@
 var serverUrl = "http://shhtest.shh.tw";
 var globalData = {}, localData, vue_panel, vue, calendarPicker, notification, formChanged;
-            var h = $(window).height();
+var h = $(window).height();
 var panelData = {
     account: null,
     plant_list: null,
@@ -36,7 +36,7 @@ var myApp = new Framework7({
             backFormCheck();
         });
         
-        myApp.hideIndicator();
+        // myApp.hideIndicator();
     },
     onAjaxStart: function (xhr) {
         myApp.showIndicator();
@@ -207,10 +207,7 @@ function ajaxData(url, back = false) {
                 globalData[key.toString()] = value;
             });
             _.forEach(globalData.load_cycle, function(element) {
-                element.Readonly = moment(element.EndDate).add(10, 'days').isBefore(moment()) || vue_panel.selectedPlant.Readonly == 1;
-            });
-            _.forEach(globalData.load_source, function(element) {
-                element.Readonly = element.UserOID == null || vue_panel.selectedPlant.Readonly == 1;
+                element.Readonly = moment(element.EndDate).add(10, 'days').isBefore(moment()) || panelData.selectedPlant.Readonly == 1;
             });
             if(!back)
                 mainView.router.load({
@@ -303,6 +300,30 @@ function backFormCheck() {
 
 // Handle Cordova Device Ready Event
 $(document).on('deviceready', function() {
+    // Push notification
+    var push = PushNotification.init({
+        "android": {},
+        "browser": {
+            pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+        },
+        "ios": {
+            alert: true,
+            badge: true,
+            sound: false
+        },
+        "windows": {}
+    }).on('registration', function(data) {
+        console.log('registration event: ' + data.registrationId);
+
+        var oldRegId = localStorage.getItem('registrationId');
+        if (oldRegId !== data.registrationId) {
+            // Save new registration ID
+            localStorage.setItem('registrationId', data.registrationId);
+            // Post registrationId to your app server as the value has changed
+        }
+    });
+    
+    // Android 返回鍵
     document.addEventListener("backbutton", function() {
         if ($('body').hasClass('with-panel-left-cover'))    // Panel
             myApp.closePanel();

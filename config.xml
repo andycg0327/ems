@@ -25,6 +25,7 @@
         <icon src="icon/android/mipmap-xhdpi/ic_launcher.png" qualifier="xhdpi" />
         <icon src="icon/android/mipmap-xxhdpi/ic_launcher.png" qualifier="xxhdpi" />
         <icon src="icon/android/mipmap-xxxhdpi/ic_launcher.png" qualifier="xxxhdpi" />
+        <resource-file src="google-services.json" target="google-services.json" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
@@ -52,9 +53,11 @@
         <icon src="icon/ios/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" width="167" height="167" />
         <icon src="icon/ios/AppIcon.appiconset/Icon-Small-50x50@1x.png" width="50" height="50" />
         <icon src="icon/ios/AppIcon.appiconset/Icon-Small-50x50@2x.png" width="100" height="100" />
+        <resource-file src="GoogleService-Info.plist" />
     </platform>
     <preference name="DisallowOverscroll" value="true" />
     <plugin name="cordova-plugin-whitelist" spec="~1.2.0" />
     <plugin name="cordova-plugin-console" spec="~1.0.1" />
     <plugin name="cordova-plugin-statusbar" spec="~1.0.1" />
+    <plugin name="phonegap-plugin-push" spec="~2.0.0" />
 </widget>

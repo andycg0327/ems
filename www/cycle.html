@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="page-content">
-        <div class="list-block">
+        <div class="list-block" v-if="source">
             <ul>
                 <li v-for="item in cycle">
                     <a :href="'cycle_edit.html?OID=' + item.OID" class="item-content item-link">
