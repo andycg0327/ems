@@ -1,45 +1,36 @@
 myApp.onPageInit('chart', function (page) {
     var plotCustomized;
     
-	localData = {
-		cycle: null,
-		cycle_data: null,
-		cycle_data_hourly: null,
-        chartLoadData: [
-            {label: "增重", key: 'WeightGain', unit: "g", data: [], bars: { show: true, barWidth: 60 * 60 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "right" }, color: "#169eee", interpolate: 'right', float: 2, Chart: true}, 
-            {label: "標準重", key: 'WeightStd', unit: "g", data: [], lines: { show: true, lineWidth: 7, steps: false }, points: { show: true, radius: 5 }, color: 89, interpolate: true, float: 2, Chart: true}, 
-            {label: "毛雞重", key: 'Weight', unit: "g", data: [], lines: { show: true, lineWidth: 3 }, points: { show: true, radius: 3 }, color: 92, interpolate: true, float: 2, Chart: true}, 
-            {label: "秤重隻數", key: 'WeightAmount', unit: "隻", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 88, interpolate: true, float: 0, Chart: false}, 
-            {label: "吃料量", key: 'Fodder', unit: "kg", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 93, interpolate: true, float: 0, Chart: false}, 
-            {label: "飲水量", key: 'Water', unit: "l", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 94, interpolate: true, float: 0, Chart: false}, 
-            {label: "換肉率", key: 'FCR', unit: "", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 95, interpolate: true, float: 2, Chart: false}],
-        sensor: null,
-        selectedCycleOID: globalData.load_cycle[0].OID,
-        selectedCycle: globalData.load_cycle[0],
-        selectedDate: [globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate],
-        periodMode: 'D',
-        parameters: ["增重", "標準重", "毛雞重"]
-	};
-    new Vue({
-        el: page.container.children[0],
-		data: localData,
-        methods: {
-            refresh: function() {
-                ajaxSensor(vue);
-            }
-        }
-    });
     vue = new Vue({
         el: page.container.children[1],
-		data: localData,
+		data: {
+            cycle: null,
+            cycle_data: null,
+            cycle_data_hourly: null,
+            chartLoadData: [
+                {label: "增重", key: 'WeightGain', unit: "g", data: [], bars: { show: true, barWidth: 60 * 60 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "right" }, color: "#169eee", interpolate: 'right', float: 2}, 
+                {label: "標準重", key: 'WeightStd', unit: "g", data: [], lines: { show: true, lineWidth: 7, steps: false }, points: { show: true, radius: 5 }, color: 89, interpolate: true, float: 2}, 
+                {label: "毛雞重", key: 'Weight', unit: "g", data: [], lines: { show: true, lineWidth: 3 }, points: { show: true, radius: 3 }, color: 92, interpolate: true, float: 2}, 
+                {label: "秤重隻數", key: 'WeightAmount', unit: "隻", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 88, interpolate: true, float: 0}, 
+                {label: "吃料量", key: 'Fodder', unit: "kg", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 93, interpolate: true, float: 0}, 
+                {label: "飲水量", key: 'Water', unit: "l", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 94, interpolate: true, float: 0}, 
+                {label: "換肉率", key: 'FCR', unit: "", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 95, interpolate: true, float: 2}],
+            sensor: null,
+            selectedCycleOID: globalData.load_cycle.length > 0 ? globalData.load_cycle[0].OID : null,
+            selectedCycle: globalData.load_cycle.length > 0 ? globalData.load_cycle[0] : {StartDate: null, EndDate: null, DailyConclude: '00:00:00'},
+            selectedDate: globalData.load_cycle.length > 0 ? [globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate] : [],
+            periodMode: 'D',
+            parameters: ["增重", "標準重", "毛雞重"]
+        },
 		methods: {
 			resetData: function() {
                 var self = this;
-				localData.cycle = globalData.load_cycle;
-				localData.cycle_data = globalData.load_cycle_data;
-				localData.cycle_data_hourly = globalData.load_cycle_data_hourly;
-				localData.sensor = globalData.sensor;
-                setTimeout(function() { self.prepareDraw(); });
+				this.cycle = globalData.load_cycle;
+				this.cycle_data = globalData.load_cycle_data;
+				this.cycle_data_hourly = globalData.load_cycle_data_hourly;
+				this.sensor = globalData.sensor;
+                if(globalData.load_cycle_data.length > 0)
+                    setTimeout(function() { self.prepareDraw(); });
 			},
 			calendarDateInit: function(e) {
                 var self = this;
@@ -48,14 +39,14 @@ myApp.onPageInit('chart', function (page) {
                     monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月' , '九月' , '十月', '十一月', '十二月'],
                     dayNamesShort: ['日', '一', '二', '三', '四', '五', '六'],
                     dateFormat: 'yyyy-mm-dd',
-                    direction: 'vertical',
+                    // direction: 'vertical',
                     firstDay: 0,
                     rangePicker: true,
                     // value: [this.selectedCycle.StartDate, moment.min(moment(), moment(this.selectedCycle.EndDate)).format('YYYY-MM-DD')],
-                    value: [this.selectedCycle.StartDate, moment(this.selectedCycle.EndDate).format('YYYY-MM-DD')],
-                    minDate: moment(this.selectedCycle.StartDate).toDate(),
+                    value: globalData.load_cycle.length > 0 ? [this.selectedCycle.StartDate, moment(this.selectedCycle.EndDate).format('YYYY-MM-DD')] : [],
+                    // minDate: moment(this.selectedCycle.StartDate).toDate(),
                     // maxDate: moment.min(moment(), moment(this.selectedCycle.EndDate)).toDate(),
-                    maxDate: moment(this.selectedCycle.EndDate).toDate(),
+                    // maxDate: moment(this.selectedCycle.EndDate).toDate(),
                     onChange: function(p, values, displayValues) {
                         self.selectedDate = values;
                     },
@@ -68,7 +59,8 @@ myApp.onPageInit('chart', function (page) {
 				calendarPicker.open();
 			},
 			calendarDateResetValue: function(e) {
-				calendarPicker.setValue([this.selectedCycle.StartDate, this.selectedCycle.EndDate]);
+                if(globalData.load_cycle.length > 0)
+                    calendarPicker.setValue([this.selectedCycle.StartDate, this.selectedCycle.EndDate]);
 			},
 			prepareDraw: function() {
                 var param = _.filter(this.parameters, function(o) { return !isNaN(o); });
@@ -116,7 +108,7 @@ myApp.onPageInit('chart', function (page) {
                 var data = [], yaxes = [], stdLineObj = [];
                 // var rangeMin = moment((groupIndex != null ? this.selectedCycle.StartDate : (this.selectedDate || this.selectedCycle.StartDate)) + " " + this.selectedCycle.DailyConclude);
                 // var rangeMax = groupIndex != null || this.selectedDate == null ? moment(this.selectedCycle.EndDate + " " + this.selectedCycle.DailyConclude) : moment(rangeMin).add(1, 'days');
-                var rangeMin = moment(moment(this.selectedDate[0]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude);
+                var rangeMin = globalData.load_cycle.length > 0 ? moment(moment(this.selectedDate[0]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment();
                 var rangeMax = moment.min(this.selectedDate.length == 2 ? moment(moment(this.selectedDate[1]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment(rangeMin).add(1, 'days'), moment().add(23, 'hours'));
                 
                 // ----- 飼養參數類 -----
@@ -196,10 +188,9 @@ myApp.onPageInit('chart', function (page) {
                         if(item.Standard != null && item.Parameter != parameter) {
                             stdLineObj.push({ x: 0, y: item.Standard, yaxis: yaxes.length - 1, label: item.Parameter, direction: 'h'});
                             parameter = item.Parameter;
-                        } else if(item.Parameter == "溫度" && self.selectedDate != null) {
+                        } else if(item.Parameter == "溫度" && self.selectedDate.length == 1) {
                             $.each(globalData.load_cycle_data, function(index, itemData) {
-                                var timestamp = moment(itemData.Date + " " + self.selectedCycle.DailyConclude);
-                                if(timestamp.isSame(self.selectedDate, 'day')) {
+                                if(itemData.Date == self.selectedDate) {
                                     stdLineObj.push({ x: 0, y: itemData.TemperatureStd, yaxis: yaxes.length - 1, label: item.Parameter + "(" + itemData.TemperatureStd + " " + item.Unit + ")", direction: 'h'});
                                 }
                             });
@@ -290,6 +281,8 @@ myApp.onPageInit('chart', function (page) {
                                     setTimeout(function() { myApp.showIndicator(); });
                                 },
                                 success : function(response) {
+                                    if(!globalData.load_cycle_data_hourly)
+                                        globalData.load_cycle_data_hourly = [];
                                     globalData.load_cycle_data_hourly = globalData.load_cycle_data_hourly.concat(response);
                                     self.resetData();
                                 },
@@ -329,8 +322,42 @@ myApp.onPageInit('chart', function (page) {
                 this.drawChart();
             },
             // 調整檢視時距
-            periodMode: function () {
-                this.drawChart(false);
+            periodMode: function (newParam, oldParam) {
+                // 下載 cycle_data_hourly
+                if(!globalData.load_cycle_data_hourly) {
+                    var self = this;
+                    $.ajax({
+                        method: 'POST',
+                        url: serverUrl + '/plant_ajax/ajaxLoadCycleDataHourly/',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
+                        dataType: "json",
+                        data: {PlantOID: localStorage.PlantOID, CycleOID: this.selectedCycle.OID, loginToken: localStorage.loginToken},
+                        retryCount: 3,
+                        beforeSend : function() {
+                            setTimeout(function() { myApp.showIndicator(); });
+                        },
+                        success : function(response) {
+                            if(!globalData.load_cycle_data_hourly)
+                                globalData.load_cycle_data_hourly = [];
+                            globalData.load_cycle_data_hourly = globalData.load_cycle_data_hourly.concat(response);
+                            self.drawChart(newParam == 'D' || oldParam == 'D');
+                        },
+                        error : function(xhr, textStatus, errorThrown ) {
+                            notification = myApp.addNotification({
+                                title: '錯誤',
+                                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
+                                hold: 5000,
+                                closeOnClick: true
+                            });
+                            if (this.retryCount--)
+                                $.ajax(this);
+                        },
+                        complete : function() {
+                            myApp.hideIndicator();
+                        }
+                    });
+                } else
+                    this.drawChart(newParam == 'D' || oldParam == 'D');
             },
             // 調整顯示參數
             parameters: function () {
@@ -339,6 +366,15 @@ myApp.onPageInit('chart', function (page) {
                     globalData.sensorData = globalData.sensorData || {};
                     self.prepareDraw();
                 });
+            }
+        }
+    });
+    new Vue({
+        el: page.container.children[0],
+		data: vue._data,
+        methods: {
+            refresh: function() {
+                ajaxSensor(vue);
             }
         }
     });

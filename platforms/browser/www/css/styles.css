@@ -73,7 +73,7 @@
 }
 
 /* Android版 SmartSelect偏移補正 */
-.list-block.inputs-list .smart-select .item-inner {
+.android .list-block.inputs-list .smart-select .item-inner {
     display: flex;
     padding-bottom: 8px;
 }

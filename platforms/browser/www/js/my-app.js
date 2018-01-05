@@ -1,5 +1,6 @@
 var serverUrl = "http://shhtest.shh.tw";
-var globalData = {}, localData, vue_panel, vue, calendarPicker, notification;
+var globalData = {}, localData, vue_panel, vue, calendarPicker, notification, formChanged;
+var h = $(window).height();
 var panelData = {
     account: null,
     plant_list: null,
@@ -22,40 +23,27 @@ var myApp = new Framework7({
     // init: false, //Disable App's automatic initialization
     material: Framework7.prototype.device.android,
     swipeBackPage: false,
-    swipePanel: 'left',
-    swipePanelActiveArea: 20,
+    // swipePanel: 'left',
+    // swipePanelActiveArea: 20,
     smartSelectOpenIn:'popup',
-
-    // Hide and show indicator during ajax requests
+    smartSelectBackText: '返回',
+    onPageAfterAnimation: function (app, page) {
+        formChanged = false;
+        $(page.container).find('form input, form select, form textarea').change(function() {
+            formChanged = true;
+        });
+        $(page.container).find('.back').removeClass('back').click(function() {
+            backFormCheck();
+        });
+        
+        // myApp.hideIndicator();
+    },
     onAjaxStart: function (xhr) {
         myApp.showIndicator();
     },
     onAjaxComplete: function (xhr) {
         myApp.hideIndicator();
-    },
-    // onPageAfterAnimation: function(app, page) {
-        // $(page.container).find('form.validate').on('form:beforesend', function (e) {
-            // var valid = true;
-            // _.forEachRight(this.find('[required]'), function(el) {
-                // if(el.value == "") {
-                    // valid = false
-                    // el.focus();
-                    // $(el).parent().addClass('required');
-                // } else
-                    // $(el).parent().removeClass('required');
-            // })
-            // if(!valid) {
-                // myApp.addNotification({
-                    // title: '訊息',
-                    // message: '有必填欄位尚未完成填寫',
-                    // hold: 5000,
-                    // closeIcon: false,
-                    // closeOnClick: true
-                // });
-                // e.detail.xhr.abort();
-            // }
-        // });
-    // }
+    }
 });
 
 // Add view
@@ -87,12 +75,12 @@ myApp.onPageInit('index', function (page) {
             }
         });
     }
-    
+
     vue = new Vue({
         el: '[data-page="index"].page .page-content',
 		data: { logged: localStorage.getItem('loginToken') != null }
     });
-    
+
     $('.form-to-data').on('click', function(){
         $.ajax({
             method: 'POST',
@@ -152,7 +140,7 @@ myApp.onPageAfterAnimation('index', function (page) {
         // $('[data-page="index"].page .page-content').css({'padding-top': ($('[data-page="index"].page .page-content').height() - $('[data-page="index"].page .page-content .login-screen-title').height() - $('[data-page="index"].page .page-content form').height()) / 2});
         // $('#logo').height($('[data-page="index"].page').height() / 3);
         // setTimeout(function() { $('#logo').height($('[data-page="index"].page .page-content').height() / 3); });
-    
+
         setTimeout(function() {
             if(localStorage.loginToken) {
                 $.ajax({
@@ -219,10 +207,7 @@ function ajaxData(url, back = false) {
                 globalData[key.toString()] = value;
             });
             _.forEach(globalData.load_cycle, function(element) {
-                element.Readonly = moment(element.EndDate).add(10, 'days').isBefore(moment()) || vue_panel.selectedPlant.Readonly == 1;
-            });
-            _.forEach(globalData.load_source, function(element) {
-                element.Readonly = element.UserOID == null || vue_panel.selectedPlant.Readonly == 1;
+                element.Readonly = moment(element.EndDate).add(10, 'days').isBefore(moment()) || panelData.selectedPlant.Readonly == 1;
             });
             if(!back)
                 mainView.router.load({
@@ -295,16 +280,87 @@ function formValidate(formElement) {
     return valid;
 }
 
+function backFormCheck() {
+    if(formChanged) {
+        myApp.modal({
+            title: '訊息',
+            text: '資料尚未儲存，確定離開？',
+            buttons: [{
+                text: '取消'
+            },{
+                text: '確定',
+                onClick: function () {
+                    mainView.router.back();
+                }
+            }]
+        });
+    } else
+        mainView.router.back();
+}
+
 // Handle Cordova Device Ready Event
 $(document).on('deviceready', function() {
+    // Push notification
+    var push = PushNotification.init({
+        "android": {},
+        "browser": {
+            pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+        },
+        "ios": {
+            alert: true,
+            badge: true,
+            sound: false
+        },
+        "windows": {}
+    }).on('registration', function(data) {
+        alert('aaa');
+        alert('registration event: ' + data.registrationId);
+        alert('aaa');
+        notification = myApp.addNotification({
+            title: '訊息',
+            message: 'registration event: ' + data.registrationId,
+            hold: 5000,
+            closeIcon: false,
+            closeOnClick: true
+        });
+        alert('registration event: ' + data.registrationId);
+
+        var oldRegId = localStorage.getItem('registrationId');
+        if (oldRegId !== data.registrationId) {
+            // Save new registration ID
+            localStorage.setItem('registrationId', data.registrationId);
+            // Post registrationId to your app server as the value has changed
+        }
+    });
+    
+    // Android 返回鍵
     document.addEventListener("backbutton", function() {
         if ($('body').hasClass('with-panel-left-cover'))    // Panel
             myApp.closePanel();
-        else if (calendarPicker.opened) // 日曆
+        else if (calendarPicker && calendarPicker.opened) // 日曆
             calendarPicker.close();
         else if ($('.modal-in').length > 0)    // Modal
             myApp.closeModal();
-        else    // 上一頁
-            mainView.router.back();
+        else if(mainView.activePage.name == 'main') { // 已在首頁
+            myApp.modal({
+                title: '訊息',
+                text: '確定結束應用程式嗎？',
+                buttons: [{
+                    text: '取消'
+                },{
+                    text: '確定',
+                    onClick: function () {
+                        navigator.app.exitApp();;
+                    }
+                }]
+            });
+        } else    // 上一頁
+            backFormCheck();
     }, false);
+});
+
+// Android 虛擬鍵盤偏移
+$(window).resize(function() {
+    if($(":focus").length > 0 && $(":focus").offset().top > h - $(window).height())
+        $(mainView.activePage.container).find('.page-content').scrollTop($(mainView.activePage.container).find('.page-content').scrollTop() + h - $(window).height());
 });

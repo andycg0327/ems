@@ -7,12 +7,12 @@
             </div>
             <div class="center sliding">飼養週期</div>
             <div class="right">
-                <a href="cycle_edit.html" class="link icon-only" :class="{disabled: readonly}"><i class="fa fa-plus" aria-hidden="true" v-if="!readonly"></i></a>
+                <a href="cycle_edit.html" class="link icon-only" :class="{disabled: readonly || !allowAdd}"><i class="fa fa-plus" aria-hidden="true" v-if="!readonly && allowAdd"></i></a>
             </div>
         </div>
     </div>
     <div class="page-content">
-        <div class="list-block">
+        <div class="list-block" v-if="source">
             <ul>
                 <li v-for="item in cycle">
                     <a :href="'cycle_edit.html?OID=' + item.OID" class="item-content item-link">

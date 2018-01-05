@@ -1,6 +1,4 @@
 myApp.onPageInit('cycle_edit', function (page) {
-    var formChanged = false;
-    
     var Cycle = _.find(globalData.load_cycle, {OID: parseInt(page.query.OID)});
 	localData = {
 		cycle: page.query.OID ? Cycle : null,
@@ -11,23 +9,6 @@ myApp.onPageInit('cycle_edit', function (page) {
         el: page.container.children[0],
 		data: localData,
         methods: {
-            back: function() {
-                if(formChanged) {
-                    myApp.modal({
-                        title: '訊息',
-                        text: '資料尚未儲存，確定離開？', 
-                        buttons: [{
-                            text: '取消'
-                        },{
-                            text: '確定',
-                            onClick: function () {
-                                mainView.router.back();
-                            }
-                        }]
-                    });
-                } else
-                    mainView.router.back();
-            },
             submit: function() {
                 if(formValidate($(page.container).find('form'))) {
                     var data = $('[data-page="cycle_edit"].page .page-content form').serializeArray();
@@ -73,16 +54,12 @@ myApp.onPageInit('cycle_edit', function (page) {
                 monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月' , '九月' , '十月', '十一月', '十二月'],
                 dayNamesShort: ['日', '一', '二', '三', '四', '五', '六'],
                 dateFormat: 'yyyy-mm-dd',
-                direction: 'vertical',
+                // direction: 'vertical',
                 firstDay: 0,
                 closeOnSelect: true,
                 value: page.query.OID ? [this.cycle.StartDate] : null,
                 minDate: !page.query.OID && globalData.load_cycle.length == 0 || page.query.OID && globalData.load_cycle.length == 1 ? null : moment(globalData.load_cycle[page.query.OID && globalData.load_cycle.length >= 2 ? 1 : 0].EndDate).add(1, 'days').toDate(),
                 toolbarCloseText: '確定'
-            });
-            
-            $(page.container).find('input, select, textarea').change(function() {
-                formChanged = true;
             });
         }
     });

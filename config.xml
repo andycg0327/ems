@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.growthment.ems" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.growthment.ems" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>EMS</name>
     <description>
         Growthment Technology CO., LTD. 
@@ -8,6 +8,11 @@
         Growthment Technology CO., LTD.
     </author>
     <content src="index.html" />
+    <preference name="DisallowOverscroll" value="true" />
+    <plugin name="cordova-plugin-whitelist" spec="~1.2.0" />
+    <plugin name="cordova-plugin-console" spec="~1.0.3" />
+    <plugin name="cordova-plugin-statusbar" spec="~2.1.3" />
+    <plugin name="phonegap-plugin-push" spec="~2.0.0" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -55,9 +60,4 @@
         <icon src="icon/ios/AppIcon.appiconset/Icon-Small-50x50@2x.png" width="100" height="100" />
         <resource-file src="GoogleService-Info.plist" />
     </platform>
-    <preference name="DisallowOverscroll" value="true" />
-    <plugin name="cordova-plugin-whitelist" spec="~1.2.0" />
-    <plugin name="cordova-plugin-console" spec="~1.0.1" />
-    <plugin name="cordova-plugin-statusbar" spec="~1.0.1" />
-    <plugin name="phonegap-plugin-push" spec="~2.0.0" />
 </widget>

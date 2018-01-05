@@ -1,17 +1,18 @@
 myApp.onPageInit('sensor', function (page) {
-	localData = {
-		sensor: null,
-		sensor_water: null,
-		sensor_fodder: null
-	};
     vue = new Vue({
         el: page.container.children[1],
-		data: localData,
+		data: {
+            load_device: null,
+            sensor: null,
+            sensor_water: null,
+            sensor_fodder: null
+        },
 		methods: {
 			resetData: function() {
-				localData.sensor = globalData.sensor;
-				localData.sensor_water = globalData.sensor_water;
-				localData.sensor_fodder = globalData.sensor_fodder;
+				this.load_device = globalData.load_device;
+				this.sensor = globalData.sensor;
+				this.sensor_water = globalData.sensor_water;
+				this.sensor_fodder = globalData.sensor_fodder;
 			},
 		},
         beforeMount: function () {
