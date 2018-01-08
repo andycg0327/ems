@@ -314,7 +314,8 @@ $(document).on('deviceready', function() {
             sound: false
         },
         "windows": {}
-    }).on('registration', function(data) {
+    });
+    push.on('registration', function(data) {
         alert('aaa');
         alert('registration event: ' + data.registrationId);
         alert('aaa');
@@ -333,6 +334,22 @@ $(document).on('deviceready', function() {
             localStorage.setItem('registrationId', data.registrationId);
             // Post registrationId to your app server as the value has changed
         }
+    });
+    push.on('notification', (data) => {
+        alert('notification');
+        alert(data.message);
+        // data.message,
+        // data.title,
+        // data.count,
+        // data.sound,
+        // data.image,
+        // data.additionalData
+    });
+
+    push.on('error', (e) => {
+        alert('error');
+        alert(e.message);
+        // e.message
     });
     
     // Android 返回鍵
