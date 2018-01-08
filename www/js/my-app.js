@@ -302,7 +302,9 @@ function backFormCheck() {
 $(document).on('deviceready', function() {
     // Push notification
     var push = PushNotification.init({
-        "android": {},
+        "android": {
+            forceShow: true
+        },
         "browser": {
             pushServiceURL: 'http://push.api.phonegap.com/v1/push'
         },

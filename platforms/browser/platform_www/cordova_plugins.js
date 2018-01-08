@@ -39,6 +39,14 @@ module.exports = [
         "merges": [
             "navigator.notification"
         ]
+    },
+    {
+        "file": "plugins/cordova-plugin-firebase/www/firebase-browser.js",
+        "id": "cordova-plugin-firebase.FirebasePlugin",
+        "pluginId": "cordova-plugin-firebase",
+        "clobbers": [
+            "FirebasePlugin"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -48,7 +56,8 @@ module.exports.metadata =
     "cordova-plugin-console": "1.0.6",
     "cordova-plugin-statusbar": "1.0.1",
     "phonegap-plugin-push": "1.8.4",
-    "cordova-plugin-dialogs": "1.2.1"
+    "cordova-plugin-dialogs": "1.2.1",
+    "cordova-plugin-firebase": "0.1.25"
 }
 // BOTTOM OF METADATA
 });
