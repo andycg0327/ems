@@ -13,7 +13,6 @@ myApp.onPageInit('cycle_edit', function (page) {
                 if(formValidate($(page.container).find('form'))) {
                     var data = $('[data-page="cycle_edit"].page .page-content form').serializeArray();
                     data.push({name: 'PlantOID', value: localStorage.PlantOID});
-                    data.push({name: 'loginToken', value: localStorage.loginToken});
                     $.ajax({
                         method: 'POST',
                         url: serverUrl + '/plant_ajax/form_cycle/',
@@ -21,24 +20,8 @@ myApp.onPageInit('cycle_edit', function (page) {
                         dataType: "html",
                         data: data,
                         retryCount: 3,
-                        beforeSend : function() {
-                            setTimeout(function() { myApp.showIndicator(); });
-                        },
                         success : function(response) {
                             ajaxData('cycle.html', true);
-                        },
-                        error : function(xhr, textStatus, errorThrown ) {
-                            notification = myApp.addNotification({
-                                title: '錯誤',
-                                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                hold: 5000,
-                                closeOnClick: true
-                            });
-                            if (this.retryCount--)
-                                $.ajax(this);
-                        },
-                        complete : function() {
-                            myApp.hideIndicator();
                         }
                     });
                 }

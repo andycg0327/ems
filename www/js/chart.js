@@ -71,11 +71,8 @@ myApp.onPageInit('chart', function (page) {
                         url: serverUrl + '/plant_ajax/ajaxSensorData/',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                         dataType: "json",
-                        data: {ChannelOID: JSON.stringify(param), Start: this.selectedCycle.StartDate, End: this.selectedCycle.EndDate, loginToken: localStorage.loginToken},
+                        data: {ChannelOID: JSON.stringify(param), Start: this.selectedCycle.StartDate, End: this.selectedCycle.EndDate},
                         retryCount: 3,
-                        beforeSend : function() {
-                            setTimeout(function() { myApp.showIndicator(); });
-                        },
                         success : function(response) {
                             $.each(response, function(index, item) {
                                 if(globalData.sensorData[item.ChannelOID] == null)
@@ -85,19 +82,6 @@ myApp.onPageInit('chart', function (page) {
                                     d.push([moment(item.UnixTime), item.Value]);
                             });
                             self.drawChart();
-                        },
-                        error : function(xhr, textStatus, errorThrown ) {
-                            notification = myApp.addNotification({
-                                title: '錯誤',
-                                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                hold: 5000,
-                                closeOnClick: true
-                            });
-                            if (this.retryCount--)
-                                $.ajax(this);
-                        },
-                        complete : function() {
-                            myApp.hideIndicator();
                         }
                     });
                 } else
@@ -262,11 +246,8 @@ myApp.onPageInit('chart', function (page) {
                         url: serverUrl + '/plant_ajax/ajaxLoadCycleData/',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                         dataType: "json",
-                        data: {PlantOID: localStorage.PlantOID, CycleOID: newCycle.OID, loginToken: localStorage.loginToken},
+                        data: {PlantOID: localStorage.PlantOID, CycleOID: newCycle.OID},
                         retryCount: 3,
-                        beforeSend : function() {
-                            setTimeout(function() { myApp.showIndicator(); });
-                        },
                         success : function(response) {
                             globalData.load_cycle_data = globalData.load_cycle_data.concat(response);
                             // 下載 cycle_data_hourly
@@ -275,44 +256,15 @@ myApp.onPageInit('chart', function (page) {
                                 url: serverUrl + '/plant_ajax/ajaxLoadCycleDataHourly/',
                                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                                 dataType: "json",
-                                data: {PlantOID: localStorage.PlantOID, CycleOID: newCycle.OID, loginToken: localStorage.loginToken},
+                                data: {PlantOID: localStorage.PlantOID, CycleOID: newCycle.OID},
                                 retryCount: 3,
-                                beforeSend : function() {
-                                    setTimeout(function() { myApp.showIndicator(); });
-                                },
                                 success : function(response) {
                                     if(!globalData.load_cycle_data_hourly)
                                         globalData.load_cycle_data_hourly = [];
                                     globalData.load_cycle_data_hourly = globalData.load_cycle_data_hourly.concat(response);
                                     self.resetData();
-                                },
-                                error : function(xhr, textStatus, errorThrown ) {
-                                    notification = myApp.addNotification({
-                                        title: '錯誤',
-                                        message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                        hold: 5000,
-                                        closeOnClick: true
-                                    });
-                                    if (this.retryCount--)
-                                        $.ajax(this);
-                                },
-                                complete : function() {
-                                    myApp.hideIndicator();
                                 }
                             });
-                        },
-                        error : function(xhr, textStatus, errorThrown ) {
-                            notification = myApp.addNotification({
-                                title: '錯誤',
-                                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                hold: 5000,
-                                closeOnClick: true
-                            });
-                            if (this.retryCount--)
-                                $.ajax(this);
-                        },
-                        complete : function() {
-                            myApp.hideIndicator();
                         }
                     });
                 }
@@ -331,29 +283,13 @@ myApp.onPageInit('chart', function (page) {
                         url: serverUrl + '/plant_ajax/ajaxLoadCycleDataHourly/',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                         dataType: "json",
-                        data: {PlantOID: localStorage.PlantOID, CycleOID: this.selectedCycle.OID, loginToken: localStorage.loginToken},
+                        data: {PlantOID: localStorage.PlantOID, CycleOID: this.selectedCycle.OID},
                         retryCount: 3,
-                        beforeSend : function() {
-                            setTimeout(function() { myApp.showIndicator(); });
-                        },
                         success : function(response) {
                             if(!globalData.load_cycle_data_hourly)
                                 globalData.load_cycle_data_hourly = [];
                             globalData.load_cycle_data_hourly = globalData.load_cycle_data_hourly.concat(response);
                             self.drawChart(newParam == 'D' || oldParam == 'D');
-                        },
-                        error : function(xhr, textStatus, errorThrown ) {
-                            notification = myApp.addNotification({
-                                title: '錯誤',
-                                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                hold: 5000,
-                                closeOnClick: true
-                            });
-                            if (this.retryCount--)
-                                $.ajax(this);
-                        },
-                        complete : function() {
-                            myApp.hideIndicator();
                         }
                     });
                 } else

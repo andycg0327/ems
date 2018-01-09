@@ -64,27 +64,11 @@ myApp.onPageInit('statistic', function (page) {
                         url: serverUrl + '/plant_ajax/ajaxLoadCycleData/',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                         dataType: "json",
-                        data: {PlantOID: localStorage.PlantOID, CycleOID: newCycle.OID, loginToken: localStorage.loginToken},
+                        data: {PlantOID: localStorage.PlantOID, CycleOID: newCycle.OID},
                         retryCount: 3,
-                        beforeSend : function() {
-                            setTimeout(function() { myApp.showIndicator(); });
-                        },
                         success : function(response) {
                             globalData.load_cycle_data = globalData.load_cycle_data.concat(response);
                             self.resetData();
-                        },
-                        error : function(xhr, textStatus, errorThrown ) {
-                            notification = myApp.addNotification({
-                                title: '錯誤',
-                                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                                hold: 5000,
-                                closeOnClick: true
-                            });
-                            if (this.retryCount--)
-                                $.ajax(this);
-                        },
-                        complete : function() {
-                            myApp.hideIndicator();
                         }
                     });
                 } else

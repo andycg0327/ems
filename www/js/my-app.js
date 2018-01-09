@@ -114,18 +114,8 @@ myApp.onPageInit('index', function (page) {
                     globalData.plant_list = response.plant_list;
                     localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
                     vue_panel.resetData();
-                    ajaxData('main.html');
+                    setTimeout(function() { ajaxData('main.html'); });
                 }
-            },
-            error : function(xhr, textStatus, errorThrown ) {
-                notification = myApp.addNotification({
-                    title: '錯誤',
-                    message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                    hold: 5000,
-                    closeOnClick: true
-                });
-                if (this.retryCount--)
-                    $.ajax(this);
             },
             complete : function() {
                 myApp.hidePreloader();
@@ -150,8 +140,11 @@ myApp.onPageAfterAnimation('index', function (page) {
                     url: serverUrl + '/plant_ajax/',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     dataType: "json",
-                    data: {RegID: localStorage.regID, loginToken: localStorage.loginToken},
+                    data: {RegID: localStorage.regID},
                     retryCount: 3,
+                    beforeSend : function() {
+                        setTimeout(function() { myApp.showPreloader('登入中..'); });
+                    },
                     success : function(response) {
                         if(response.loginToken == "False")
                             localStorage.removeItem("loginToken");
@@ -160,8 +153,11 @@ myApp.onPageAfterAnimation('index', function (page) {
                             globalData.plant_list = response.plant_list;
                             localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
                             vue_panel.resetData();
-                            ajaxData('main.html');
+                            setTimeout(function() { ajaxData('main.html'); });
                         }
+                    },
+                    complete : function() {
+                        myApp.hidePreloader();
                     }
                 });
             }
@@ -182,11 +178,8 @@ function ajaxData(url, back = false) {
         url: serverUrl + '/plant_ajax/ajaxData/',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         dataType: "json",
-        data: {PlantOID: localStorage.PlantOID, loginToken: localStorage.loginToken},
+        data: {PlantOID: localStorage.PlantOID},
         retryCount: 3,
-        beforeSend : function() {
-            setTimeout(function() { myApp.showIndicator(); });
-        },
         success : function(response) {
             myApp.closeNotification(notification);
             $.each(response, function(key, value){
@@ -205,19 +198,6 @@ function ajaxData(url, back = false) {
                     url: url,
                     force: true
                 });
-        },
-        error : function(xhr, textStatus, errorThrown ) {
-            notification = myApp.addNotification({
-                title: '錯誤',
-                message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                hold: 5000,
-                closeOnClick: true
-            });
-            if (this.retryCount--)
-                $.ajax(this);
-        },
-        complete : function() {
-            myApp.hideIndicator();
         }
     });
 }
@@ -346,15 +326,18 @@ $(document).on('deviceready', function() {
     }, false);
 }).ajaxStart(function() {
     setTimeout(function() { myApp.showIndicator(); });
-}).ajaxError(function(xhr, textStatus, errorThrown) {
+}).ajaxSend(function( event, jqxhr, settings ) {
+    if(settings.data.indexOf('loginToken') == -1)
+        settings.data += "&loginToken=" + localStorage.loginToken;
+}).ajaxError(function(event, jqxhr, settings, thrownError) {
     notification = myApp.addNotification({
         title: '錯誤',
-        message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
+        message: '連線失敗，重新嘗試中..(' + settings.retryCount + ')',
         hold: 5000,
         closeOnClick: true
     });
-    if (this.retryCount--)
-        $.ajax(this);
+    if (settings.retryCount--)
+        $.ajax(settings);
 }).ajaxComplete(function() {
     myApp.hideIndicator();
 });

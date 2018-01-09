@@ -16,27 +16,11 @@ myApp.onPageInit('report', function (page) {
                     url: serverUrl + '/plant_ajax/ajaxReportData/',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
                     dataType: "json",
-                    data: {loginToken: localStorage.loginToken},
+                    data: {},
                     retryCount: 3,
-                    beforeSend : function() {
-                        setTimeout(function() { myApp.showIndicator(); });
-                    },
                     success : function(response) {
                         globalData.report = response;
                         self.resetData();
-                    },
-                    error : function(xhr, textStatus, errorThrown ) {
-                        myApp.addNotification({
-                            title: '錯誤',
-                            message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                            hold: 5000,
-                            closeOnClick: true
-                        });
-                        if (this.retryCount--)
-                            $.ajax(this);
-                    },
-                    complete : function() {
-                        myApp.hideIndicator();
                     }
                 });
             }
