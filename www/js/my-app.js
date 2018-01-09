@@ -152,9 +152,6 @@ myApp.onPageAfterAnimation('index', function (page) {
                     dataType: "json",
                     data: {RegID: localStorage.regID, loginToken: localStorage.loginToken},
                     retryCount: 3,
-                    beforeSend : function() {
-                        setTimeout(function() { myApp.showPreloader('登入中..'); });
-                    },
                     success : function(response) {
                         if(response.loginToken == "False")
                             localStorage.removeItem("loginToken");
@@ -165,19 +162,6 @@ myApp.onPageAfterAnimation('index', function (page) {
                             vue_panel.resetData();
                             ajaxData('main.html');
                         }
-                    },
-                    error : function(xhr, textStatus, errorThrown ) {
-                        notification = myApp.addNotification({
-                            title: '錯誤',
-                            message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
-                            hold: 5000,
-                            closeOnClick: true
-                        });
-                        if (this.retryCount--)
-                            $.ajax(this);
-                    },
-                    complete : function() {
-                        myApp.hidePreloader();
                     }
                 });
             }
@@ -362,6 +346,19 @@ $(document).on('deviceready', function() {
         } else    // 上一頁
             backFormCheck();
     }, false);
+}).ajaxStart(function() {
+    setTimeout(function() { myApp.showIndicator(); });
+}).ajaxError(function(xhr, textStatus, errorThrown) {
+    notification = myApp.addNotification({
+        title: '錯誤',
+        message: '連線失敗，重新嘗試中..(' + this.retryCount + ')',
+        hold: 5000,
+        closeOnClick: true
+    });
+    if (this.retryCount--)
+        $.ajax(this);
+}).ajaxComplete(function() {
+    myApp.hideIndicator();
 });
 
 // Android 虛擬鍵盤偏移
