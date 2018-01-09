@@ -303,8 +303,6 @@ $(document).on('deviceready', function() {
     });
     push.on('registration', function(data) {
         localStorage.regID = data.registrationId;
-        alert(localStorage.regID);
-        alert(data.registrationId);
     });
     push.on('notification', (data) => {
         alert('notification');
