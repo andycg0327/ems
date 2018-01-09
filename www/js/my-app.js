@@ -82,12 +82,13 @@ myApp.onPageInit('index', function (page) {
     });
 
     $('.form-to-data').on('click', function(){
+        // 手動登入
         $.ajax({
             method: 'POST',
             url: serverUrl + '/plant_ajax/',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             dataType: "json",
-            data: {loginToken: btoa($('[data-page="index"].page [name="Account"]').val() + ":" + $('[data-page="index"].page [name="Password"]').val())},
+            data: {RegID: localStorage.regID, loginToken: btoa($('[data-page="index"].page [name="Account"]').val() + ":" + $('[data-page="index"].page [name="Password"]').val())},
             retryCount: 3,
             beforeSend : function() {
                 setTimeout(function() { myApp.showPreloader('登入中..'); });
@@ -143,12 +144,13 @@ myApp.onPageAfterAnimation('index', function (page) {
 
         setTimeout(function() {
             if(localStorage.loginToken) {
+                // 自動登入
                 $.ajax({
                     method: 'POST',
                     url: serverUrl + '/plant_ajax/',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     dataType: "json",
-                    data: {loginToken: localStorage.loginToken},
+                    data: {RegID: localStorage.regID, loginToken: localStorage.loginToken},
                     retryCount: 3,
                     beforeSend : function() {
                         setTimeout(function() { myApp.showPreloader('登入中..'); });
@@ -316,24 +318,7 @@ $(document).on('deviceready', function() {
         "windows": {}
     });
     push.on('registration', function(data) {
-        alert('aaa');
-        alert('registration event: ' + data.registrationId);
-        alert('aaa');
-        notification = myApp.addNotification({
-            title: '訊息',
-            message: 'registration event: ' + data.registrationId,
-            hold: 5000,
-            closeIcon: false,
-            closeOnClick: true
-        });
-        alert('registration event: ' + data.registrationId);
-
-        var oldRegId = localStorage.getItem('registrationId');
-        if (oldRegId !== data.registrationId) {
-            // Save new registration ID
-            localStorage.setItem('registrationId', data.registrationId);
-            // Post registrationId to your app server as the value has changed
-        }
+        localStorage.regID = data.registrationId;
     });
     push.on('notification', (data) => {
         alert('notification');
