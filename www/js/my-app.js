@@ -345,7 +345,6 @@ $(document).on('deviceready', function() {
         // data.image,
         // data.additionalData
     });
-
     push.on('error', (e) => {
         alert('error');
         alert(e.message);
