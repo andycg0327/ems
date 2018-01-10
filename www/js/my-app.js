@@ -38,12 +38,6 @@ var myApp = new Framework7({
         });
         
         // myApp.hideIndicator();
-    },
-    onAjaxStart: function (xhr) {
-        myApp.showIndicator();
-    },
-    onAjaxComplete: function (xhr) {
-        myApp.hideIndicator();
     }
 });
 

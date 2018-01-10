@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="page-content">
-        <div class="card" v-for="item in alarm">
+        <div class="card" v-for="item in _.orderBy(alarm, ['Read', 'SentTime'], ['asc', 'desc'])">
             <div class="card-content" @click="setRead(item)">
                 <div class="list-block">
                     <ul>
