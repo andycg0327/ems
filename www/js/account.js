@@ -32,6 +32,17 @@ myApp.onPageInit('account', function (page) {
     });
     vue = new Vue({
         el: page.container.children[1],
-		data: localData
+		data: localData,
+        methods: {
+            logout: function() {
+                localStorage.removeItem("loginToken");
+                myApp.closePanel(false);
+                mainView.router.back({
+                    url: 'index.html',
+                    reload: true
+                });
+                // this.$destroy();
+            }
+        }
     });
 });

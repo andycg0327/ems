@@ -3,6 +3,7 @@ var globalData = {}, localData, vue_panel, vue, calendarPicker, notification, fo
 var h = $(window).height();
 var panelData = {
     account: null,
+    alarm: [],
     plant_list: null,
     selectedPlant: null
 };
@@ -60,17 +61,9 @@ myApp.onPageInit('index', function (page) {
             methods: {
                 resetData: function() {
                     panelData.account = globalData.account ? globalData.account : null;
+                    panelData.alarm = globalData.alarm ? globalData.alarm : null;
                     panelData.plant_list = globalData.plant_list ? globalData.plant_list : null;
                     panelData.selectedPlant = globalData.plant_list ? _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) : null;
-                },
-                logout: function() {
-                    localStorage.removeItem("loginToken");
-                    myApp.closePanel(false);
-                    mainView.router.back({
-                        url: 'index.html',
-                        reload: true
-                    });
-                    // this.$destroy();
                 }
             }
         });
@@ -111,6 +104,7 @@ myApp.onPageInit('index', function (page) {
                 } else {
                     localStorage.loginToken = response.loginToken;
                     globalData.account = response.account;
+                    globalData.alarm = response.alarm;
                     globalData.plant_list = response.plant_list;
                     localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
                     vue_panel.resetData();
@@ -150,6 +144,10 @@ myApp.onPageAfterAnimation('index', function (page) {
                             localStorage.removeItem("loginToken");
                         else if(response.loginToken == localStorage.loginToken) {
                             globalData.account = response.account;
+                            globalData.alarm = response.alarm;
+                            _.forEach(globalData.alarm, function(element) {
+                                element.Read = parseInt(element.Read);
+                            });
                             globalData.plant_list = response.plant_list;
                             localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
                             vue_panel.resetData();

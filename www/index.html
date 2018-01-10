@@ -60,9 +60,10 @@
                 <div class="facebook-date">廠區總數: {{plant_list.length}}</div>
             </div>
             <div class="card-footer no-border">
-                <a href="account.html" class="link close-panel">詳細</a>
+                <a href="account.html" class="link close-panel">帳戶</a>
                 <a href="report.html" class="link close-panel">報修</a>
-                <a href="#" class="link" @click.prevent="logout">登出</a>
+                <a href="alarm.html" class="link close-panel"><i class="icon">警報<span class="badge color-red" style="top:0" v-if="_.filter(alarm, {Read: 0}).length">{{_.filter(alarm, {Read: 0}).length}}</span></i></a>
+                <!--a href="#" class="link" @click.prevent="logout">登出</a-->
             </div>
         </div>
         <div class="card facebook-card" v-if="plant_list">
@@ -199,6 +200,7 @@
 <script type="text/javascript" src="js/account.js"></script>
 <script type="text/javascript" src="js/report.js"></script>
 <script type="text/javascript" src="js/report_form.js"></script>
+<script type="text/javascript" src="js/alarm.js"></script>
 <script type="text/javascript" src="js/plant_switch.js"></script>
 
 </html>
