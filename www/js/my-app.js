@@ -97,12 +97,7 @@ myApp.onPageInit('index', function (page) {
                     });
                 } else {
                     localStorage.loginToken = response.loginToken;
-                    globalData.account = response.account;
-                    globalData.alarm = response.alarm;
-                    globalData.plant_list = response.plant_list;
-                    localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
-                    vue_panel.resetData();
-                    setTimeout(function() { ajaxData('main.html'); });
+                    loginSuccessful(response);
                 }
             },
             complete : function() {
@@ -137,15 +132,7 @@ myApp.onPageAfterAnimation('index', function (page) {
                         if(response.loginToken == "False")
                             localStorage.removeItem("loginToken");
                         else if(response.loginToken == localStorage.loginToken) {
-                            globalData.account = response.account;
-                            globalData.alarm = response.alarm;
-                            _.forEach(globalData.alarm, function(element) {
-                                element.Read = parseInt(element.Read);
-                            });
-                            globalData.plant_list = response.plant_list;
-                            localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
-                            vue_panel.resetData();
-                            setTimeout(function() { ajaxData('main.html'); });
+                            loginSuccessful(response);
                         }
                     },
                     complete : function() {
@@ -156,6 +143,18 @@ myApp.onPageAfterAnimation('index', function (page) {
         }, 1000);
     });
 }).trigger();
+
+function loginSuccessful(response) {
+    globalData.account = response.account;
+    globalData.alarm = response.alarm;
+    _.forEach(globalData.alarm, function(element) {
+        element.Read = parseInt(element.Read);
+    });
+    globalData.plant_list = response.plant_list;
+    localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
+    vue_panel.resetData();
+    setTimeout(function() { ajaxData('main.html'); });
+}
 
 function ajaxData(url, back = false) {
     notification = myApp.addNotification({
