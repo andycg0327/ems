@@ -331,7 +331,7 @@ $(document).on('deviceready', function() {
     if (settings.retryCount--)
         $.ajax(settings);
 }).ajaxComplete(function() {
-    myApp.hideIndicator();
+    setTimeout(function() { myApp.hideIndicator(); });
 });
 
 // Android 虛擬鍵盤偏移
