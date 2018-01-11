@@ -39,7 +39,7 @@ myApp.onPageInit('account', function (page) {
                 myApp.closePanel(false);
                 mainView.router.back({
                     url: 'index.html',
-                    reload: true
+                    force: true
                 });
                 // this.$destroy();
             }
