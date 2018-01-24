@@ -124,7 +124,7 @@ And each series support the following options:
 
                 // 顯示X軸數值為標題
                 if(opts.legend.showTitle === true)
-                    $("#legendTitle_" + placeholder[0].id).html(opts.legend.titleFormat ? moment(pos.x).tz(moment.tz.guess()).format(opts.legend.titleFormat) : pos.x);
+                    $("#legendTitle_" + placeholder[0].id).html(opts.legend.titleFormat ? opts.legend.titleFormat(pos.x) : pos.x);
                 
                 if(opts.legend.showValue === true) {
                     var lengthIndex = 0, dataset = plot.getData();

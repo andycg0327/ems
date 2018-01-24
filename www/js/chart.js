@@ -14,8 +14,12 @@ myApp.onPageInit('chart', function (page) {
                 {label: "秤重隻數", key: 'WeightAmount', unit: "隻", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 88, interpolate: true, float: 0}, 
                 {label: "吃料量", key: 'Fodder', unit: "kg", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 93, interpolate: true, float: 0}, 
                 {label: "飲水量", key: 'Water', unit: "l", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 94, interpolate: true, float: 0}, 
-                {label: "換肉率", key: 'FCR', unit: "", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 95, interpolate: true, float: 2}],
+                {label: "換肉率", key: 'FCR', unit: "", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 95, interpolate: true, float: 2}, 
+                {label: "育成率", key: 'AliveRatio', unit: "%", data: [], lines: { show: true, lineWidth: 5 }, points: { show: true, radius: 3 }, color: 96, interpolate: true, float: 2},
+                {label: "死亡數", key: 'Dead', unit: "隻", data: [], bars: { show: true, barWidth: 60 * 60 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "right" }, color: "#ee9e16", interpolate: 'right', float: 2}],
             sensor: null,
+            sensorData: globalData.sensorData,
+            sensorDataDownloaded: {},
             selectedCycleOID: globalData.load_cycle.length > 0 ? globalData.load_cycle[0].OID : null,
             selectedCycle: globalData.load_cycle.length > 0 ? globalData.load_cycle[0] : {StartDate: null, EndDate: null, DailyConclude: '00:00:00'},
             selectedDate: globalData.load_cycle.length > 0 ? [globalData.load_cycle[0].StartDate, globalData.load_cycle[0].EndDate] : [],
@@ -63,6 +67,26 @@ myApp.onPageInit('chart', function (page) {
                     calendarPicker.setValue([this.selectedCycle.StartDate, this.selectedCycle.EndDate]);
 			},
 			prepareDraw: function() {
+                var self = this;
+                var param = _.filter(this.parameters, function(o) { return !isNaN(o); });
+                var examineStart = moment(self.selectedCycle ? (self.selectedCycle.StartDate + " " + self.selectedCycle.DailyConclude) : '2000-01-01');
+                var examineEnd = self.selectedCycle ? moment.min(moment(self.selectedCycle.EndDate + " " + self.selectedCycle.DailyConclude), moment.tz()) : moment.tz();
+                _.forEach(_.cloneDeep(param), function(key) {
+                    if(!self.sensorDataDownloaded[key]) {
+                        self.sensorDataDownloaded[key] = {
+                            Start: examineStart,
+                            End: examineEnd,
+                            Downloading: true
+                        }
+                    } else if(self.sensorDataDownloaded[key].Start.isAfter(examineStart) || self.sensorDataDownloaded[key].End.diff(examineEnd, 'minutes') < -20) {
+                        self.sensorDataDownloaded[key].Start = moment.min(self.sensorDataDownloaded[key].Start, examineStart);
+                        self.sensorDataDownloaded[key].End = moment.max(self.sensorDataDownloaded[key].End, examineEnd);
+                        self.sensorDataDownloaded[key].Downloading = true;
+                    } else {
+                        _.pull(param, key);
+                        self.sensorDataDownloaded[key].Downloading = false;
+                    }
+                });
                 var param = _.filter(this.parameters, function(o) { return !isNaN(o); });
                 if(param.length > 0) {
                     var self = this;
@@ -119,8 +143,8 @@ myApp.onPageInit('chart', function (page) {
                     var timestamp = moment(item.ConcludeEnd);
                     // 依序查找飼養參數
                     $.each(data, function(index, el){
-                        // 飼養參數有勾選 && (日平均 或 非日平均但為['標準重', '吃料量', '飲水量', '換肉率'])
-                        if(self.parameters.indexOf(el.label) != -1 && (self.periodMode == 'D' || (self.periodMode != 'D' && ['標準重', '吃料量', '飲水量', '換肉率'].indexOf(el.label) != -1))) {
+                        // 飼養參數有勾選 && (日平均 或 非日平均但為['標準重', '吃料量', '飲水量', '換肉率', '育成率'])
+                        if(self.parameters.indexOf(el.label) != -1 && (self.periodMode == 'D' || (self.periodMode != 'D' && ['標準重', '吃料量', '飲水量', '換肉率', '育成率'].indexOf(el.label) != -1))) {
                             // cycle_data 在時間範圍內
                             if(timestamp.isBetween(rangeMin, rangeMax, null, el.label == '增重' ? '(]' : '[]'))
                                 el.data.push([timestamp, Math.max(0, parseFloat(item[el.key] || 0))]);
@@ -134,8 +158,8 @@ myApp.onPageInit('chart', function (page) {
                     if((self.periodMode == 'H' && timestamp.minute() == 0) || self.periodMode == 'M') {
                         // 依序查找飼養參數
                         $.each(data, function(index, el){
-                            // 飼養參數有勾選 && 非日平均 && 不為['標準重', '吃料量', '飲水量', '換肉率']
-                            if(self.parameters.indexOf(el.label) != -1 && self.periodMode != 'D' && ['標準重', '吃料量', '飲水量', '換肉率'].indexOf(el.label) == -1) {
+                            // 飼養參數有勾選 && 非日平均 && 不為['標準重', '吃料量', '飲水量', '換肉率', '育成率']
+                            if(self.parameters.indexOf(el.label) != -1 && self.periodMode != 'D' && ['標準重', '吃料量', '飲水量', '換肉率', '育成率'].indexOf(el.label) == -1) {
                                 // cycle_data 在時間範圍內
                                 if(timestamp.isBetween(rangeMin, rangeMax, null, el.label == '增重' ? '(]' : '[]'))
                                     el.data.push([timestamp, Math.max(0, parseFloat(item[el.key] || 0))]);
@@ -152,14 +176,14 @@ myApp.onPageInit('chart', function (page) {
                         var digital = item.Max == 1;
                         // Y軸設定值: Max由小至大排序，同樣數值者同Y軸
                         if(item.Max != axisMax) {
-                            yaxes.push({show: !digital, position: yaxes.length % 2 ? "left" : "right", min: item.Min, max: item.Max});
+                            yaxes.push({show: !digital, position: yaxes.length % 2 ? "left" : "right", min: digital ? -1 : item.Min, max: digital ? 2 : item.Max});
                             axisMax = item.Max;
                         }
                     
                         data.push({
                             label: '[' + item.InterfaceTitle + '] ' + item.Parameter, 
                             unit: item.Unit, 
-                            data: _.filter(globalData.sensorData[item.ChannelOID], function(o) { return moment(o[0]).isBetween(rangeMin, rangeMax, null, '[]'); }), 
+                            data: _.filter(self.sensorData[item.ChannelOID], function(o) { return moment(o[0]).isBetween(rangeMin, rangeMax, null, '[]'); }), 
                             lines: { show: !digital, lineWidth: 5, color: "opacity:0.6" }, 
                             points: { show: digital, radius: 3 }, 
                             color: index, 
@@ -196,14 +220,22 @@ myApp.onPageInit('chart', function (page) {
                                 markings.push({ color: "#000", lineWidth: 1, xaxis: { from: x, to: x } });
                             return markings;
                         } },
-                        legend: { position: "nw", backgroundOpacity: 0, showTitle: true, titleFormat: self.periodMode == 'D' ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm:ss", showValue: true },
+                        legend: {
+                            position: "nw",
+                            backgroundOpacity: 0,
+                            showTitle: true,
+                            titleFormat: function(x) {
+                                return moment(x).tz(moment.tz.guess()).format(self.periodMode == 'D' ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm:ss") + " (日齡: " + (moment(parseFloat(x)-1).tz(moment.tz.guess()).diff(self.selectedCycle.StartDate + ' ' + self.selectedCycle.DailyConclude, 'days') + 1) + ")";
+                            },
+                            showValue: true
+                        },
                         tooltip: {
                             show: true,
                             contents: function(item) {
                                 var x = item.datapoint[0].toFixed(2), y = parseFloat(item.datapoint[1].toFixed(2)), xValue = moment(parseFloat(x)).tz(moment.tz.guess());
                                 // 全週期
                                 if(self.periodMode == 'D' && item.seriesIndex <= 7)
-                                    return "日齡 " + moment(xValue).diff(self.selectedCycle.StartDate, 'days') + "<br />" + (xValue.isValid() ? moment(xValue).subtract(1, 'day').format("YYYY-MM-DD HH:mm") + ' ~ ' + moment.min(xValue, moment(moment().format("YYYY-MM-DD HH:00"))).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
+                                    return "日齡 " + moment(xValue).diff(self.selectedCycle.StartDate + ' ' + self.selectedCycle.DailyConclude, 'days') + "<br />" + (xValue.isValid() ? moment(xValue).subtract(1, 'day').format("YYYY-MM-DD HH:mm") + ' ~ ' + moment.min(xValue, moment(moment().format("YYYY-MM-DD HH:00"))).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
                                 else
                                     return (xValue.isValid() ? xValue.format("YYYY-MM-DD HH:mm:ss") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
                             }
@@ -299,7 +331,7 @@ myApp.onPageInit('chart', function (page) {
             parameters: function () {
                 var self = this;
                 $('.popup.smart-select-popup').off('popup:close').on('popup:close', function () {
-                    globalData.sensorData = globalData.sensorData || {};
+                    // globalData.sensorData = globalData.sensorData || {};
                     self.prepareDraw();
                 });
             }
