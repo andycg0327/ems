@@ -19,6 +19,7 @@ myApp.onPageInit('sensor', function (page) {
         beforeMount: function () {
             var self = this;
             ajaxSensor(this);
+            setInterval(function() { ajaxSensor(self); }, 30000);
             setInterval(function() { self.now = moment(); }, 1000);
         }
     });

@@ -88,7 +88,7 @@ myApp.onPageAfterAnimation('statistic', function (page) {
                 $('[data-page="statistic"].page .row > div:nth-child(1)').css({
                     width: 142
                 });
-                $('[data-page="statistic"].page .row > div:nth-child(2)').width(window.outerWidth - $('[data-page="statistic"].page .row > div:nth-child(1)').width());
+                $('[data-page="statistic"].page .row > div:nth-child(2)').width($('[data-page="statistic"].page').width() - $('[data-page="statistic"].page .row > div:nth-child(1)').width());
     var swiper_header = myApp.swiper('#swiper_header .swiper-container', {
         spaceBetween: 0,
         breakpoints: {
