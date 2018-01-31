@@ -18,12 +18,29 @@ myApp.onPageInit('sensor', function (page) {
 		},
         beforeMount: function () {
             var self = this;
-            ajaxSensor(this);
-            setInterval(function() { ajaxSensor(self); }, 30000);
-            setInterval(function() { self.now = moment(); }, 1000);
+            autoRefresh(this);
+            updateTimestamp(this);
         }
     });
 });
+
+updateTimestamp = function(vueInstance) {
+    if(mainView.activePage.name == "sensor") {
+        vueInstance.now = moment();
+        setTimeout(function() {
+            updateTimestamp(vueInstance);
+        }, 1000);
+    }
+}
+
+autoRefresh = function(vueInstance) {
+    if(mainView.activePage.name == "sensor") {
+        ajaxSensor(vueInstance);
+        setTimeout(function() {
+            autoRefresh(vueInstance);
+        }, 30000);
+    }
+}
 
 ajaxSensor= function(vueInstance) {
     $.ajax({
