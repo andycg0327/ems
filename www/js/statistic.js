@@ -44,7 +44,7 @@ myApp.onPageInit('statistic', function (page) {
                 });
                 // 儲存格左右padding調整縮小
                 $('[data-page="statistic"].page .numeric-cell').css({
-                    padding: '0 5px'
+                    padding: '0 10px'
                 });
             }
         },
@@ -84,6 +84,11 @@ myApp.onPageInit('statistic', function (page) {
 
 // var swiper_header, swiper_contents;
 myApp.onPageAfterAnimation('statistic', function (page) {
+                // 日期欄寬度自動調整
+                $('[data-page="statistic"].page .row > div:nth-child(1)').css({
+                    width: 142
+                });
+                $('[data-page="statistic"].page .row > div:nth-child(2)').width(window.outerWidth - $('[data-page="statistic"].page .row > div:nth-child(1)').width());
     var swiper_header = myApp.swiper('#swiper_header .swiper-container', {
         spaceBetween: 0,
         breakpoints: {

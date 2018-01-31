@@ -33,6 +33,7 @@ myApp.onPageInit('chart', function (page) {
 				this.cycle_data = globalData.load_cycle_data;
 				this.cycle_data_hourly = globalData.load_cycle_data_hourly;
 				this.sensor = globalData.sensor;
+                this.sensorData = globalData.sensorData;
                 if(globalData.load_cycle_data.length > 0)
                     setTimeout(function() { self.prepareDraw(); });
 			},
@@ -254,6 +255,7 @@ myApp.onPageInit('chart', function (page) {
             }
 		},
         beforeMount: function () {
+            globalData.sensorData = globalData.sensorData || {};
             this.calendarDateInit();
             // 沒下載過sensor時，下載供參數選擇列表顯示
             if(!globalData.sensor)

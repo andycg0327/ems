@@ -20,7 +20,7 @@
                     <li>
                         <a href="#" class="item-link smart-select" data-page-title="種雞來源" data-back-on-select="true">
                             <select name="SourceOID" :disabled="readonly">
-                                <option v-for="s in source" :value="s.OID" :selected="cycle.SourceOID == s.OID">{{s.Title}}</option>
+                                <option v-for="s in source" :value="s.OID" :selected="cycle && cycle.SourceOID == s.OID">{{s.Title}}</option>
                             </select>
                             <div class="item-content">
                                 <div class="item-media">種雞來源</div>

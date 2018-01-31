@@ -2,6 +2,7 @@ myApp.onPageInit('sensor', function (page) {
     vue = new Vue({
         el: page.container.children[1],
 		data: {
+            now: moment(),
             load_device: null,
             sensor: null,
             sensor_water: null,
@@ -16,7 +17,9 @@ myApp.onPageInit('sensor', function (page) {
 			},
 		},
         beforeMount: function () {
+            var self = this;
             ajaxSensor(this);
+            setInterval(function() { self.now = moment(); }, 1000);
         }
     });
 });
@@ -32,6 +35,9 @@ ajaxSensor= function(vueInstance) {
         success : function(response) {
             $.each(response, function(key, value){
                 globalData[key.toString()] = value;
+                $.each(globalData[key.toString()], function(index, item){
+                    item.LastUpdate = moment(item.LastUpdate);
+                });
             });
             vueInstance.resetData();
         }

@@ -1,4 +1,4 @@
-var serverUrl = "http://shhtest.shh.tw";
+var serverUrl = "http://ems-shh.us-east-1.elasticbeanstalk.com/";
 var globalData = {}, localData, vue_panel, vue, calendarPicker, notification, formChanged;
 var h = $(window).height();
 var panelData = {

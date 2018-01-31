@@ -27,6 +27,7 @@
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="14" />
         <preference name="android-windowSoftInputMode" value="adjustResize" />
+        <preference name="BackgroundColor" value="0xff795548"/>
         <icon src="icon/android/mipmap-ldpi/ic_launcher.png" density="ldpi" />
         <icon src="icon/android/mipmap-mdpi/ic_launcher.png" density="mdpi" />
         <icon src="icon/android/mipmap-hdpi/ic_launcher.png" density="hdpi" />
@@ -39,6 +40,7 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <preference name="BackupWebStorage" value="none" />
+        <preference name="BackgroundColor" value="0xfff7f7f8"/>
         <icon src="icon/ios/AppIcon.appiconset/Icon-App-20x20@1x.png" width="20" height="20" />
         <icon src="icon/ios/AppIcon.appiconset/Icon-App-20x20@2x.png" width="40" height="40" />
         <icon src="icon/ios/AppIcon.appiconset/Icon-App-20x20@3x.png" width="60" height="60" />
