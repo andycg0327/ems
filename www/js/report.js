@@ -31,4 +31,7 @@ myApp.onPageInit('report', function (page) {
         mounted: function () {
         }
     });
+    new Vue({
+        el: page.container.children[0]
+    });
 });

@@ -8,15 +8,15 @@ myApp.onPageInit('chart', function (page) {
             cycle_data: null,
             cycle_data_hourly: null,
             chartLoadData: [
-                {label: "增重", key: 'WeightGain', unit: "g", data: [], bars: { show: true, barWidth: 60 * 60 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "right" }, color: "#169eee", interpolate: 'right', float: 2}, 
+                {label: "增重", key: 'WeightGain', unit: "g", data: [], bars: { show: true, barWidth: 60 * 60 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "center" }, color: "#169eee", interpolate: 'right', float: 2}, 
                 {label: "標準重", key: 'WeightStd', unit: "g", data: [], lines: { show: true, lineWidth: 7, steps: false }, points: { show: true, radius: 5 }, color: 89, interpolate: true, float: 2}, 
                 {label: "毛雞重", key: 'Weight', unit: "g", data: [], lines: { show: true, lineWidth: 3 }, points: { show: true, radius: 3 }, color: 92, interpolate: true, float: 2}, 
                 {label: "秤重隻數", key: 'WeightAmount', unit: "隻", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 88, interpolate: true, float: 0}, 
                 {label: "吃料量", key: 'Fodder', unit: "kg", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 93, interpolate: true, float: 0}, 
                 {label: "飲水量", key: 'Water', unit: "l", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 94, interpolate: true, float: 0}, 
                 {label: "換肉率", key: 'FCR', unit: "", data: [], lines: { show: true, lineWidth: 7 }, points: { show: true, radius: 5 }, color: 95, interpolate: true, float: 2}, 
-                {label: "育成率", key: 'AliveRatio', unit: "%", data: [], lines: { show: true, lineWidth: 5 }, points: { show: true, radius: 3 }, color: 96, interpolate: true, float: 2},
-                {label: "死亡數", key: 'Dead', unit: "隻", data: [], bars: { show: true, barWidth: 60 * 60 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "right" }, color: "#ee9e16", interpolate: 'right', float: 2}],
+                {label: "育成率", key: 'AliveRatio', unit: "%", data: [], lines: { show: true, lineWidth: 5 }, points: { show: true, radius: 3 }, color: 96, interpolate: true, float: 2}, 
+                {label: "死亡數", key: 'Dead', unit: "隻", data: [], bars: { show: true, barWidth: 60 * 60 * 12 * 1000, lineWidth: 1, fillColor: { colors: [{opacity: 0.8}, {opacity: 0.1}] }, align: "center" }, color: "#ee9e16", interpolate: 'right', float: 2}],
             sensor: null,
             sensorData: globalData.sensorData,
             sensorDataDownloaded: {},
@@ -114,60 +114,74 @@ myApp.onPageInit('chart', function (page) {
 			},
             drawChart: function(redraw = true) {
                 var self = this;
+                // 清除所有sensor正在下載中的標記
+                _.forEach(this.sensorDataDownloaded, function(item) {
+                    item.Downloading = false;
+                });
+                
                 var data = [], yaxes = [], stdLineObj = [];
-                // var rangeMin = moment((groupIndex != null ? this.selectedCycle.StartDate : (this.selectedDate || this.selectedCycle.StartDate)) + " " + this.selectedCycle.DailyConclude);
-                // var rangeMax = groupIndex != null || this.selectedDate == null ? moment(this.selectedCycle.EndDate + " " + this.selectedCycle.DailyConclude) : moment(rangeMin).add(1, 'days');
                 var rangeMin = globalData.load_cycle.length > 0 ? moment(moment(this.selectedDate[0]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment();
                 var rangeMax = moment.min(this.selectedDate.length == 2 ? moment(moment(this.selectedDate[1]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment(rangeMin).add(1, 'days'), moment().add(23, 'hours'));
                 
+                var rangeMin = this.selectedCycle ? (globalData.load_cycle.length > 0 ? moment(moment(this.selectedDate[0]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude) : moment.tz("Asia/Taipei")) : moment('2000-01-01');
+                var rangeMax = this.selectedCycle ? (this.selectedDate.length == 2 ? moment.min(moment.max(moment(moment(this.selectedDate[1]).format('YYYY-MM-DD') + " " + this.selectedCycle.DailyConclude), moment(rangeMin).add(1, 'days')), moment.tz("Asia/Taipei")) : moment(rangeMin).add(1, 'days')) : moment.tz("Asia/Taipei");
+                
                 // ----- 飼養參數類 -----
-                // var data = _.cloneDeep(this.chartLoadData);
                 // 依序查找飼養參數
                 $.each(this.chartLoadData, function(index, el){
                     if(self.parameters.indexOf(el.label) != -1) {
                         data.push(_.cloneDeep(el));
                         // 設定Y軸
                         if(!(el.label == '毛雞重' && self.parameters.indexOf('標準重') != -1))
-                            yaxes.push({position: yaxes.length % 2 ? "left" : "right"});
+                            yaxes.push({position: yaxes.length % 2 ? "left" : "right", min: 0});
                         data[index].yaxis = yaxes.length;
                         // 設定增重柱狀圖寬度
                         if(el.label == '增重' && self.periodMode == 'D')
-                            data[0].bars.barWidth *= 24;
+                            data[index].bars.barWidth *= 12;
                         else if(el.label == '增重' && self.periodMode == 'M')
-                            data[0].bars.barWidth /= 6;
+                            data[index].bars.barWidth /= 6;
+                        else if(el.label == '死亡數' && self.selectedDate[0]) {
+                            data[index].bars.barWidth *= 2;
+                            data[index].bars.align = 'left';
+                        }
                     } else
                         data.push({});
                 });
                 
                 // 依序疊代 load_cycle_data
                 $.each(globalData.load_cycle_data, function(i, item) {
-                    var timestamp = moment(item.ConcludeEnd);
                     // 依序查找飼養參數
                     $.each(data, function(index, el){
-                        // 飼養參數有勾選 && (日平均 或 非日平均但為['標準重', '吃料量', '飲水量', '換肉率', '育成率'])
-                        if(self.parameters.indexOf(el.label) != -1 && (self.periodMode == 'D' || (self.periodMode != 'D' && ['標準重', '吃料量', '飲水量', '換肉率', '育成率'].indexOf(el.label) != -1))) {
+                        var timestamp = el.label == '標準重' && self.periodMode != 'D' ? moment(item.ConcludeEnd).subtract(1, 'days') : moment(item.ConcludeStart);
+                        // 飼養參數有勾選 && (日平均 或 非日平均且不為['增重', '毛雞重', '秤重隻數'])
+                        if(self.parameters.indexOf(el.label) != -1 && (self.periodMode == 'D' || (self.periodMode != 'D' && ['增重', '毛雞重', '秤重隻數'].indexOf(el.label) == -1))) {
                             // cycle_data 在時間範圍內
-                            if(timestamp.isBetween(rangeMin, rangeMax, null, el.label == '增重' ? '(]' : '[]'))
+                            if(timestamp.isBetween(rangeMin, rangeMax, null, el.label == '增重' ? '(]' : (el.label == '死亡數' ? '[)' : '[]')))
                                 el.data.push([timestamp, Math.max(0, parseFloat(item[el.key] || 0))]);
                         }
                     });
                 });
-                // 依序疊代 load_cycle_data_hourly
-                $.each(globalData.load_cycle_data_hourly, function(i, item) {
-                    var timestamp = moment(item.DateTime);
-                    // 小時制&為整點 || 分鐘制
-                    if((self.periodMode == 'H' && timestamp.minute() == 0) || self.periodMode == 'M') {
+                // 小時制 || 分鐘制 && 依序疊代 load_cycle_data_hourly
+                if(self.periodMode != 'D') {
+                    $.each(_.groupBy(globalData.load_cycle_data_hourly, function(el) { return moment(el.DateTime).format(self.periodMode == 'H' ? "YYYY-MM-DD HH" : "YYYY-MM-DD HH:mm"); }), function(i, item) {
+                        var timestamp = moment(item[0].DateTime);
                         // 依序查找飼養參數
                         $.each(data, function(index, el){
-                            // 飼養參數有勾選 && 非日平均 && 不為['標準重', '吃料量', '飲水量', '換肉率', '育成率']
-                            if(self.parameters.indexOf(el.label) != -1 && self.periodMode != 'D' && ['標準重', '吃料量', '飲水量', '換肉率', '育成率'].indexOf(el.label) == -1) {
+                            // 飼養參數有勾選 && 為['增重', '毛雞重', '秤重隻數']
+                            if(self.parameters.indexOf(el.label) != -1 && ['增重', '毛雞重', '秤重隻數'].indexOf(el.label) != -1) {
                                 // cycle_data 在時間範圍內
-                                if(timestamp.isBetween(rangeMin, rangeMax, null, el.label == '增重' ? '(]' : '[]'))
-                                    el.data.push([timestamp, Math.max(0, parseFloat(item[el.key] || 0))]);
+                                if(timestamp.isBetween(rangeMin, rangeMax, null, el.label == '增重' ? '(]' : '[]')) {
+                                    if(el.label == '增重')
+                                        el.data.push([timestamp, Math.max(0, item[0][self.periodMode == 'H' ? 'WeightGainHourly' : 'WeightGain'])]);
+                                    else if(el.label == '毛雞重')
+                                        el.data.push([timestamp, Math.max(0, item[0][el.key])]);
+                                    else if(el.label == '秤重隻數')
+                                        el.data.push([timestamp, Math.max(0, _.sumBy(item, el.key))]);
+                                }
                             }
                         });
-                    }
-                });
+                    });
+                }
                 
                 // ----- Sensor類 -----
                 var axisMax = -9999, parameter = "";
@@ -195,12 +209,12 @@ myApp.onPageInit('chart', function (page) {
                         });
                         // 標準線
                         if(item.Standard != null && item.Parameter != parameter) {
-                            stdLineObj.push({ x: 0, y: item.Standard, yaxis: yaxes.length - 1, label: item.Parameter, direction: 'h'});
+                            stdLineObj.push({ x: 0, y: item.Standard, yaxis: yaxes.length, label: item.Parameter, direction: 'h'});
                             parameter = item.Parameter;
                         } else if(item.Parameter == "溫度" && self.selectedDate.length == 1) {
                             $.each(globalData.load_cycle_data, function(index, itemData) {
                                 if(itemData.Date == self.selectedDate) {
-                                    stdLineObj.push({ x: 0, y: itemData.TemperatureStd, yaxis: yaxes.length - 1, label: item.Parameter + "(" + itemData.TemperatureStd + " " + item.Unit + ")", direction: 'h'});
+                                    stdLineObj.push({ x: 0, y: itemData.TemperatureStd, yaxis: yaxes.length, label: item.Parameter + "(" + itemData.TemperatureStd + " " + item.Unit + ")", direction: 'h'});
                                 }
                             });
                         }
@@ -209,48 +223,54 @@ myApp.onPageInit('chart', function (page) {
                 });
                 
                 // 繪製曲線圖
-                if(!plotCustomized || redraw) {
-                    plotCustomized = $.plot("#chartCustomized", data, {
-                        series: { shadowSize: 0 },
-                        crosshair: { mode: "x", lock: true },
-                        xaxis: { mode: "time", timezone: "browser", monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月' , '九月' , '十月', '十一月', '十二月'] },
-                        yaxes: yaxes,
-                        grid: { borderWidth: 1, hoverable: true, clickable: true, markings: function (axes){
-                            var markings = [];
-                            for (var x = Math.floor(axes.xaxis.min) + 604800000; x < axes.xaxis.max; x += 604800000)
-                                markings.push({ color: "#000", lineWidth: 1, xaxis: { from: x, to: x } });
-                            return markings;
-                        } },
-                        legend: {
-                            position: "nw",
-                            backgroundOpacity: 0,
-                            showTitle: true,
-                            titleFormat: function(x) {
-                                return moment(x).tz(moment.tz.guess()).format(self.periodMode == 'D' ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm:ss") + " (日齡: " + (moment(parseFloat(x)-1).tz(moment.tz.guess()).diff(self.selectedCycle.StartDate + ' ' + self.selectedCycle.DailyConclude, 'days') + 1) + ")";
-                            },
-                            showValue: true
+                var xAxis = this.plot ? this.plot.getXAxes()[0] : null;
+                this.plot = $.plot("#chartCustomized", data, {
+                    series: { shadowSize: 0 },
+                    crosshair: { mode: "x", lock: true },
+                    xaxis: { mode: "time", timezone: "browser", monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月' , '九月' , '十月', '十一月', '十二月'] },
+                    yaxes: yaxes,
+                    grid: { borderWidth: 1, hoverable: true, clickable: true, markings: function (axes){
+                        var markings = [];
+                        for (var x = Math.floor(axes.xaxis.min) + 604800000; x < axes.xaxis.max; x += 604800000)
+                            markings.push({ color: "#000", lineWidth: 1, xaxis: { from: x, to: x } });
+                        return markings;
+                    } },
+                    legend: {
+                        position: "nw",
+                        backgroundOpacity: 0,
+                        showTitle: true,
+                        titleFormat: function(x) {
+                            return moment(x).tz(moment.tz.guess()).format(self.periodMode == 'D' ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm:ss") + (self.selectedCycle ? " (日齡: " + (moment(parseFloat(x)-1).tz(moment.tz.guess()).diff(self.selectedCycle.StartDate + ' ' + self.selectedCycle.DailyConclude, 'days') + 1) + ")" : "");
                         },
-                        tooltip: {
-                            show: true,
-                            contents: function(item) {
-                                var x = item.datapoint[0].toFixed(2), y = parseFloat(item.datapoint[1].toFixed(2)), xValue = moment(parseFloat(x)).tz(moment.tz.guess());
-                                // 全週期
-                                if(self.periodMode == 'D' && item.seriesIndex <= 7)
-                                    return "日齡 " + moment(xValue).diff(self.selectedCycle.StartDate + ' ' + self.selectedCycle.DailyConclude, 'days') + "<br />" + (xValue.isValid() ? moment(xValue).subtract(1, 'day').format("YYYY-MM-DD HH:mm") + ' ~ ' + moment.min(xValue, moment(moment().format("YYYY-MM-DD HH:00"))).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
-                                else
-                                    return (xValue.isValid() ? xValue.format("YYYY-MM-DD HH:mm:ss") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
-                            }
-                        },
-                        overlays: stdLineObj,
-                        selection: {
-                            mode: "x",
-                            reload: self.selectedDate == null
+                        showValue: true
+                    },
+                    tooltip: {
+                        show: true,
+                        contents: function(item) {
+                            var x = item.datapoint[0].toFixed(2), y = parseFloat(item.datapoint[1].toFixed(2)), xValue = moment(parseFloat(x)).tz(moment.tz.guess());
+                            // 全週期
+                            if(self.periodMode == 'D' && item.seriesIndex <= 8 && self.selectedCycle)
+                                return "日齡: " + xValue.diff(self.selectedCycle.StartDate + ' ' + self.selectedCycle.DailyConclude, 'days') + "<br />" + (xValue.isValid() ? xValue.format("YYYY-MM-DD HH:mm") + ' ~ ' + moment.min(moment(xValue).add(1, 'day'), moment(moment.tz("Asia/Taipei").format("YYYY-MM-DD HH:00"))).subtract(1, 'seconds').format("YYYY-MM-DD HH:mm") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
+                            else
+                                return (xValue.isValid() ? xValue.format("YYYY-MM-DD HH:mm:ss") : x) + "<br />" + item.series.label + " = " + (item.series.interpolate === true || item.series.digitalTitle == null ? y.toFixed(item.series.float) : item.series.digitalTitle[y]) + item.series.unit;
                         }
+                    },
+                    overlays: stdLineObj,
+                    selection: {
+                        mode: "x",
+                        reload: self.selectedDate == null
+                    }
+                });
+                
+                // 不為重繪時把X軸變回原本選定的範圍
+                if(!redraw && xAxis) {
+                    $.each(this.plot.getXAxes(), function(_, axis) {
+                        var opts = axis.options;
+                        opts.min = xAxis.min;
+                        opts.max = xAxis.max;
                     });
-                    // new Hammer(document.getElementById('chartCustomized'), { domEvents: true });
-                } else {
-                    plotCustomized.setData(data);
-                    plotCustomized.draw();
+                    this.plot.setupGrid();
+                    this.plot.draw();
                 }
             }
 		},

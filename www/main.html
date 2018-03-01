@@ -60,7 +60,7 @@
             </div>
         </div>
         <div class="card" v-if="cycle_data">
-            <div class="card-footer"><span></span><span>數據結算: {{lastUpdate.format("YYYY-MM-DD HH:mm")}} ({{lastUpdate.fromNow()}})</span></div>
+            <div class="card-footer"><span></span><span>數據結算: {{lastUpdate.format("YYYY-MM-DD HH:mm")}} ({{lastUpdate.from(now)}})</span></div>
         </div>
     </div>
 </div>

@@ -36,6 +36,14 @@ var myApp = new Framework7({
         $(page.container).find('.back').removeClass('back').click(function() {
             backFormCheck();
         });
+        $(page.container).find('a').each(function() {
+            var self = this;
+            $(this).prop('router', $(this).prop('href')).removeAttr('href').click(function() {
+                mainView.router.load({
+                    content: localStorage.getItem(self.router)
+                });
+            })
+        });
         
         // myApp.hideIndicator();
     }
@@ -46,6 +54,49 @@ var mainView = myApp.addView('.view-main', {
     // Because we want to use dynamic navbar, we need to enable it for this view:
     // dynamicNavbar: true
 });
+
+Vue.mixin({
+    methods: {
+        route: function(url) {
+            var path = url.split("?")[0];
+            var query = {};
+            if(url.split("?").length > 1) {
+                _.forEach(url.split("?")[1].split("&"), function(el) {
+                    query[el.split("=")[0]] = el.split("=")[1];
+                });
+            }
+            
+            if(!localStorage[path]){
+                notification = myApp.addNotification({
+                    title: '訊息',
+                    message: '資料同步中，請稍後..',
+                    closeIcon: false,
+                    button: {}
+                });
+
+                $.ajax({
+                    method: 'GET',
+                    url: 'http://mobile.shh.tw/' + path,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    dataType: "html",
+                    retryCount: 3,
+                    success : function(response) {
+                        myApp.closeNotification(notification);
+                        localStorage[path] = response;
+                        mainView.router.load({
+                            content: localStorage.getItem(path),
+                            query: query
+                        });
+                    }
+                });
+            } else
+                mainView.router.load({
+                    content: localStorage.getItem(path),
+                    query: query
+                });
+        }
+    }
+})
 
 myApp.onPageInit('index', function (page) {
     if(!vue_panel) {
@@ -59,7 +110,17 @@ myApp.onPageInit('index', function (page) {
                     panelData.plant_list = globalData.plant_list ? globalData.plant_list : null;
                     panelData.selectedPlant = globalData.plant_list ? _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) : null;
                 }
-            }
+            }/* ,
+            beforeMount: function () {
+                $(".panel").find('a').each(function() {
+                    var self = this;
+                    $(this).prop('router', $(this).prop('href')).removeAttr('href').click(function() {
+                        mainView.router.load({
+                            content: localStorage.getItem(self.router)
+                        });
+                    })
+                });
+            } */
         });
     }
 
@@ -152,6 +213,16 @@ function loginSuccessful(response) {
     });
     globalData.plant_list = response.plant_list;
     localStorage.PlantOID = localStorage.PlantOID && _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) ? localStorage.PlantOID : globalData.plant_list[0].PlantOID;
+    // mobileVersion
+    if(!localStorage.mobileVersion || moment(response.mobileVersion).isAfter(moment(localStorage.mobileVersion))) {
+        for (var i = 0; i < localStorage.length; i++){
+            if(localStorage.key(i).indexOf(".html") != -1) {
+                localStorage.removeItem(localStorage.key(i));
+                i--;
+            }
+        }
+        localStorage.mobileVersion = response.mobileVersion;
+    }
     vue_panel.resetData();
     setTimeout(function() { ajaxData('main.html'); });
 }
@@ -255,6 +326,15 @@ function backFormCheck() {
         mainView.router.back();
 }
 
+function updateTimestamp(vueInstance, page) {
+    if(mainView.activePage.name == page) {
+        vueInstance.now = moment();
+        setTimeout(function() {
+            updateTimestamp(vueInstance, page);
+        }, 1000);
+    }
+}
+
 // Handle Cordova Device Ready Event
 $(document).on('deviceready', function() {
     // Push notification
@@ -318,7 +398,7 @@ $(document).on('deviceready', function() {
 }).ajaxStart(function() {
     setTimeout(function() { myApp.showIndicator(); });
 }).ajaxSend(function( event, jqxhr, settings ) {
-    if(settings.data.indexOf('loginToken') == -1)
+    if(settings.method == "POST" && settings.data.indexOf('loginToken') == -1)
         settings.data += "&loginToken=" + localStorage.loginToken;
 }).ajaxError(function(event, jqxhr, settings, thrownError) {
     notification = myApp.addNotification({

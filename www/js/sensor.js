@@ -17,21 +17,11 @@ myApp.onPageInit('sensor', function (page) {
 			},
 		},
         beforeMount: function () {
-            var self = this;
             autoRefresh(this);
-            updateTimestamp(this);
+            updateTimestamp(this, "sensor");
         }
     });
 });
-
-updateTimestamp = function(vueInstance) {
-    if(mainView.activePage.name == "sensor") {
-        vueInstance.now = moment();
-        setTimeout(function() {
-            updateTimestamp(vueInstance);
-        }, 1000);
-    }
-}
 
 autoRefresh = function(vueInstance) {
     if(mainView.activePage.name == "sensor") {
