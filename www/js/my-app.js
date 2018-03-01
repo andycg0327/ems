@@ -100,27 +100,37 @@ Vue.mixin({
 
 myApp.onPageInit('index', function (page) {
     if(!vue_panel) {
-        vue_panel = new Vue({
-            el: '.panel',
-            data: panelData,
-            methods: {
-                resetData: function() {
-                    panelData.account = globalData.account ? globalData.account : null;
-                    panelData.alarm = globalData.alarm ? globalData.alarm : null;
-                    panelData.plant_list = globalData.plant_list ? globalData.plant_list : null;
-                    panelData.selectedPlant = globalData.plant_list ? _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) : null;
-                }
-            }/* ,
-            beforeMount: function () {
-                $(".panel").find('a').each(function() {
-                    var self = this;
-                    $(this).prop('router', $(this).prop('href')).removeAttr('href').click(function() {
-                        mainView.router.load({
-                            content: localStorage.getItem(self.router)
+        $.ajax({
+            method: 'GET',
+            url: 'http://mobile.shh.tw/panel.html',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            dataType: "html",
+            retryCount: 3,
+            success : function(response) {
+                $(".panel").html(response);
+                vue_panel = new Vue({
+                    el: '.panel',
+                    data: panelData,
+                    methods: {
+                        resetData: function() {
+                            panelData.account = globalData.account ? globalData.account : null;
+                            panelData.alarm = globalData.alarm ? globalData.alarm : null;
+                            panelData.plant_list = globalData.plant_list ? globalData.plant_list : null;
+                            panelData.selectedPlant = globalData.plant_list ? _.find(globalData.plant_list, {PlantOID: localStorage.PlantOID}) : null;
+                        }
+                    }/* ,
+                    beforeMount: function () {
+                        $(".panel").find('a').each(function() {
+                            var self = this;
+                            $(this).prop('router', $(this).prop('href')).removeAttr('href').click(function() {
+                                mainView.router.load({
+                                    content: localStorage.getItem(self.router)
+                                });
+                            })
                         });
-                    })
+                    } */
                 });
-            } */
+            }
         });
     }
 
